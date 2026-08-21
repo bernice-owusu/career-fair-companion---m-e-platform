@@ -1,0 +1,10 @@
+{
+  "name": "Career Fair Companion & M&E Platform",
+  "description": "Mobile-first PWA for participant registration, booth tracking, reflections, exit surveys, and real-time M&E analytics synced with Google Sheets.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
