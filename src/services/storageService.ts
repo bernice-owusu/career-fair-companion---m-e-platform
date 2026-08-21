@@ -13,7 +13,7 @@ const STORAGE_KEYS = {
 };
 
 export const DEFAULT_CONFIG: EventConfig = {
-  eventName: "National Youth Career Fair 2026",
+  eventName: "Nexus Career Fair 2026",
   eventDate: "2026-08-22",
   eventLocation: "Grand Exhibition Center, Main Auditorium",
   minBoothsRequired: 4,
@@ -207,11 +207,11 @@ const SEED_PARTICIPANTS: Participant[] = [
 ];
 
 const SEED_ATTENDANCE: AttendanceRecord[] = [
-  { id: "att-1", participantId: "p-1", participantName: "Bernice Owusu", eventName: "National Youth Career Fair 2026", checkInTime: "2026-08-22T08:30:00Z", status: "Checked In" },
-  { id: "att-2", participantId: "p-2", participantName: "John Mensah", eventName: "National Youth Career Fair 2026", checkInTime: "2026-08-22T08:40:00Z", status: "Checked In" },
-  { id: "att-3", participantId: "p-3", participantName: "Ama Boateng", eventName: "National Youth Career Fair 2026", checkInTime: "2026-08-22T08:45:00Z", status: "Checked In" },
-  { id: "att-4", participantId: "p-4", participantName: "Kwesi Appiah", eventName: "National Youth Career Fair 2026", checkInTime: "2026-08-22T09:00:00Z", status: "Checked In" },
-  { id: "att-5", participantId: "p-5", participantName: "Eunice Aryee", eventName: "National Youth Career Fair 2026", checkInTime: "2026-08-22T09:10:00Z", status: "Checked In" }
+  { id: "att-1", participantId: "p-1", participantName: "Bernice Owusu", eventName: "Nexus Youth Career Fair 2026", checkInTime: "2026-08-22T08:30:00Z", status: "Checked In" },
+  { id: "att-2", participantId: "p-2", participantName: "John Mensah", eventName: "Nexus Youth Career Fair 2026", checkInTime: "2026-08-22T08:40:00Z", status: "Checked In" },
+  { id: "att-3", participantId: "p-3", participantName: "Ama Boateng", eventName: "Nexus Youth Career Fair 2026", checkInTime: "2026-08-22T08:45:00Z", status: "Checked In" },
+  { id: "att-4", participantId: "p-4", participantName: "Kwesi Appiah", eventName: "Nexus Youth Career Fair 2026", checkInTime: "2026-08-22T09:00:00Z", status: "Checked In" },
+  { id: "att-5", participantId: "p-5", participantName: "Eunice Aryee", eventName: "Nexus Youth Career Fair 2026", checkInTime: "2026-08-22T09:10:00Z", status: "Checked In" }
 ];
 
 const SEED_VISITS: BoothVisit[] = [
@@ -451,12 +451,12 @@ export class StorageService {
   // Registration
   static registerParticipant(data: Omit<Participant, 'id' | 'code' | 'registeredAt'>): Participant {
     const participants = this.getParticipants();
-    
+
     // Generate unique code format KCF-XXXXX
     const num = Math.floor(10000 + Math.random() * 90000);
     const code = `KCF-${num}`;
     const id = `p-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
-    
+
     const newParticipant: Participant = {
       ...data,
       id,
@@ -631,13 +631,13 @@ export class StorageService {
     const config = this.getConfig();
 
     const totalRegistered = participants.length;
-    
+
     // Count unique checked-in participants
     const checkedInParticipantIds = new Set(
       attendance.filter(a => a.status === 'Checked In').map(a => a.participantId)
     );
     const totalAttended = checkedInParticipantIds.size;
-    
+
     const attendanceRate = totalRegistered > 0 ? (totalAttended / totalRegistered) * 100 : 0;
     const totalBoothVisits = visits.filter(v => v.verificationStatus === 'verified').length;
 

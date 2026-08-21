@@ -39,23 +39,22 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Right Actions */}
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           {/* Entrance QR Generator / Poster */}
-          <button
+          {/* <button
             onClick={onOpenEntranceQR}
             title="Show Entrance QR Code"
             className="flex items-center gap-1.5 text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1.5 rounded-lg border border-slate-700 transition"
           >
             <QrCode className="w-3.5 h-3.5 text-indigo-400" />
             <span className="hidden sm:inline">Entrance QR</span>
-          </button>
+          </button> */}
 
           {/* Role Switcher */}
           <button
             onClick={onToggleAdmin}
-            className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition shadow-sm ${
-              isAdmin
-                ? 'bg-indigo-600 text-white hover:bg-indigo-500 shadow-indigo-600/30'
-                : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700'
-            }`}
+            className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition shadow-sm ${isAdmin
+              ? 'bg-indigo-600 text-white hover:bg-indigo-500 shadow-indigo-600/30'
+              : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700'
+              }`}
           >
             {isAdmin ? (
               <>

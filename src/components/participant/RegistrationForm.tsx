@@ -112,9 +112,8 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
               placeholder="e.g. Bernice Owusu"
               value={formData.fullName}
               onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-              className={`w-full px-3.5 py-2.5 bg-slate-950 border rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none transition ${
-                errors.fullName ? 'border-rose-500 ring-1 ring-rose-500' : 'border-slate-700 focus:border-indigo-500'
-              }`}
+              className={`w-full px-3.5 py-2.5 bg-slate-950 border rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none transition ${errors.fullName ? 'border-rose-500 ring-1 ring-rose-500' : 'border-slate-700 focus:border-indigo-500'
+                }`}
             />
             {errors.fullName && <p className="text-[11px] text-rose-400 mt-1">{errors.fullName}</p>}
           </div>
@@ -130,9 +129,8 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
                   placeholder="+233 24 000 0000"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className={`w-full px-3.5 py-2.5 bg-slate-950 border rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none transition ${
-                    errors.phone ? 'border-rose-500 ring-1 ring-rose-500' : 'border-slate-700 focus:border-indigo-500'
-                  }`}
+                  className={`w-full px-3.5 py-2.5 bg-slate-950 border rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none transition ${errors.phone ? 'border-rose-500 ring-1 ring-rose-500' : 'border-slate-700 focus:border-indigo-500'
+                    }`}
                 />
               </div>
               {errors.phone && <p className="text-[11px] text-rose-400 mt-1">{errors.phone}</p>}
@@ -147,9 +145,8 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
                 placeholder="name@example.com"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className={`w-full px-3.5 py-2.5 bg-slate-950 border rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none transition ${
-                  errors.email ? 'border-rose-500 ring-1 ring-rose-500' : 'border-slate-700 focus:border-indigo-500'
-                }`}
+                className={`w-full px-3.5 py-2.5 bg-slate-950 border rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none transition ${errors.email ? 'border-rose-500 ring-1 ring-rose-500' : 'border-slate-700 focus:border-indigo-500'
+                  }`}
               />
               {errors.email && <p className="text-[11px] text-rose-400 mt-1">{errors.email}</p>}
             </div>

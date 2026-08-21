@@ -13,7 +13,7 @@ import { RecordBoothVisitModal } from './components/participant/RecordBoothVisit
 import { ExitSurveyModal } from './components/participant/ExitSurveyModal';
 import { AdminLogin } from './components/admin/AdminLogin';
 import { AdminDashboard } from './components/admin/AdminDashboard';
-import { EntranceQRPresenter } from './components/admin/EntranceQRPresenter';
+// import { EntranceQRPresenter } from './components/admin/EntranceQRPresenter';
 
 import { StorageService } from './services/storageService';
 import { GoogleSheetsService } from './services/googleSheetsService';
@@ -28,7 +28,7 @@ export default function App() {
     StorageService.getCurrentParticipant()
   );
   const [isAdmin, setIsAdmin] = useState<boolean>(StorageService.isAdminLoggedIn());
-  
+
   // Participant flow states
   const [flowScreen, setFlowScreen] = useState<ParticipantFlowScreen>(() => {
     const current = StorageService.getCurrentParticipant();
@@ -324,11 +324,11 @@ export default function App() {
       />
 
       {/* Entrance QR Poster Modal */}
-      <EntranceQRPresenter
+      {/* <EntranceQRPresenter
         config={config}
         isOpen={isEntranceQROpen}
         onClose={() => setIsEntranceQROpen(false)}
-      />
+      /> */}
     </div>
   );
 }

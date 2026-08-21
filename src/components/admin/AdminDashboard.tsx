@@ -58,7 +58,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     title: '',
     message: '',
     confirmLabel: 'Confirm',
-    onConfirm: () => {},
+    onConfirm: () => { },
   });
 
   // Participant directory filters
@@ -352,11 +352,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as AdminTab)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition ${
-                isActive
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition ${isActive
                   ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30'
                   : 'text-slate-400 hover:text-white hover:bg-slate-800'
-              }`}
+                }`}
             >
               <Icon className="w-4 h-4" />
               <span>{tab.label}</span>
@@ -463,8 +462,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <AreaChart data={hourlyAttendance} margin={{ left: 0, right: 20, top: 10, bottom: 10 }}>
                     <defs>
                       <linearGradient id="attendArea" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.4}/>
-                        <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.4} />
+                        <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                       </linearGradient>
                     </defs>
                     <XAxis dataKey="time" stroke="#64748b" tick={{ fontSize: 10 }} />
@@ -677,11 +676,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           {boothCount}
                         </td>
                         <td className="py-3.5 px-4 text-center">
-                          <span className={`inline-flex px-2 py-0.5 rounded-md text-[10px] font-bold ${
-                            isReqMet
+                          <span className={`inline-flex px-2 py-0.5 rounded-md text-[10px] font-bold ${isReqMet
                               ? 'bg-emerald-950 text-emerald-300 border border-emerald-800'
                               : 'bg-slate-950 text-slate-400 border border-slate-800'
-                          }`}>
+                            }`}>
                             {isReqMet ? 'Complete' : 'Incomplete'}
                           </span>
                         </td>
@@ -1203,11 +1201,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
             {/* Sync Action & Feedback */}
             {syncStatusMsg && (
-              <div className={`p-4 rounded-2xl text-xs flex items-center gap-2 border ${
-                syncStatusMsg.type === 'success'
+              <div className={`p-4 rounded-2xl text-xs flex items-center gap-2 border ${syncStatusMsg.type === 'success'
                   ? 'bg-emerald-950/80 text-emerald-300 border-emerald-800'
                   : 'bg-rose-950/80 text-rose-300 border-rose-800'
-              }`}>
+                }`}>
                 {syncStatusMsg.type === 'success' ? <CheckCircle2 className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
                 <span>{syncStatusMsg.text}</span>
               </div>
@@ -1328,11 +1325,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         <div className="space-y-6">
           {/* Settings Saved Notification Banner */}
           {settingsSavedMsg && (
-            <div className={`p-4 rounded-2xl text-xs flex items-center justify-between gap-3 border shadow-lg ${
-              settingsSavedMsg.type === 'success'
+            <div className={`p-4 rounded-2xl text-xs flex items-center justify-between gap-3 border shadow-lg ${settingsSavedMsg.type === 'success'
                 ? 'bg-emerald-950/90 text-emerald-200 border-emerald-700/80 shadow-emerald-950/50'
                 : 'bg-rose-950/90 text-rose-200 border-rose-700/80 shadow-rose-950/50'
-            }`}>
+              }`}>
               <div className="flex items-center gap-2.5">
                 {settingsSavedMsg.type === 'success' ? (
                   <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
@@ -1385,7 +1381,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   type="text"
                   value={settingsForm.eventName}
                   onChange={(e) => setSettingsForm({ ...settingsForm, eventName: e.target.value })}
-                  placeholder="e.g. National Youth Career Fair 2026"
+                  placeholder="e.g. Nexus Career Fair 2026"
                   className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-indigo-500"
                 />
               </div>
@@ -1804,11 +1800,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fadeIn">
           <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl p-6 relative space-y-4">
             <div className="flex items-center gap-3">
-              <div className={`w-10 h-10 rounded-2xl flex items-center justify-center ${
-                confirmDialog.isDestructive
+              <div className={`w-10 h-10 rounded-2xl flex items-center justify-center ${confirmDialog.isDestructive
                   ? 'bg-rose-950 border border-rose-800 text-rose-400'
                   : 'bg-indigo-950 border border-indigo-800 text-indigo-400'
-              }`}>
+                }`}>
                 <ShieldAlert className="w-5 h-5" />
               </div>
               <div>
@@ -1832,11 +1827,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <button
                 type="button"
                 onClick={confirmDialog.onConfirm}
-                className={`px-4 py-2.5 rounded-xl text-xs font-bold transition shadow-lg ${
-                  confirmDialog.isDestructive
+                className={`px-4 py-2.5 rounded-xl text-xs font-bold transition shadow-lg ${confirmDialog.isDestructive
                     ? 'bg-rose-600 hover:bg-rose-500 text-white shadow-rose-600/30'
                     : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-600/30'
-                }`}
+                  }`}
               >
                 {confirmDialog.confirmLabel}
               </button>
