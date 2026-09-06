@@ -1,6 +1,29 @@
 import { StorageService } from './storageService';
 import { Participant, AttendanceRecord, Booth, BoothVisit, ExitSurvey } from '../types';
 
+const PARTICIPANT_HEADERS = [
+  "Participant ID", "Registration Code", "Registration Type", "Registered Before Event", "Registered At",
+  "Checked In", "Checked In At", "Name", "Email", "Phone", "PSGH Registration Number", "Year of Completion",
+  "Highest Education", "Current Job Title", "Current Area of Practice", "Current Area Other", "Region",
+  "Ideal Career Path", "Ideal Career Path Other", "Career Fair Expectations", "Career Fair Expectations Other",
+  "Career Tracks", "Skills Lab Resume Assistance", "Skills Lab Resume Assistance Other", "Resume Quality (1-5)",
+  "CV Uploaded", "Interview Confidence (1-5)", "Mock Interview", "How Heard About Career Fair", "How Heard Other",
+  "Attended Last Year", "Facilitator Questions"
+];
+
+const participantRow = (p: Participant): string[] => [
+  p.id, p.code, p.registrationType || "", p.registeredBeforeEvent ? "Yes" : "No", p.registeredAt || "",
+  p.checkedIn ? "Yes" : "No", p.checkedInAt || "", p.fullName, p.email, p.phone,
+  p.psghRegistrationNumber || "", p.yearOfCompletion || "", p.highestEducation || "", p.currentJobTitle || "",
+  p.currentAreaOfPractice || "", p.currentAreaOther || "", p.regionOfResidence || "",
+  p.idealCareerPath || "", p.idealCareerPathOther || "",
+  (p.careerFairExpectations || []).join(", "), p.careerFairExpectationsOther || "",
+  (p.careerTracks || []).join(", "), p.skillsLabResumeAssistance || "", p.skillsLabResumeAssistanceOther || "",
+  p.resumeQuality ? String(p.resumeQuality) : "", p.cvUploaded ? "Yes" : "No", p.interviewConfidence ? String(p.interviewConfidence) : "",
+  p.mockInterview || "", p.heardAboutCareerFair || "", p.heardAboutCareerFairOther || "",
+  p.attendedLastYear || "", p.facilitatorQuestions || ""
+];
+
 export class GoogleSheetsService {
   // Generates complete Apps Script code that the user can deploy
   static getAppsScriptCode(): string {
@@ -16,6 +39,56 @@ export class GoogleSheetsService {
  * 5. Copy the Web App URL and paste it in M&E Settings in the App!
  */
 
+const REGISTER_HEADERS = [
+  "Participant ID", "Registration Code", "Registration Type", "Registered Before Event", "Registered At",
+  "Checked In", "Checked In At", "Name", "Email", "Phone", "PSGH Registration Number", "Year of Completion",
+  "Highest Education", "Current Job Title", "Current Area of Practice", "Current Area Other", "Region",
+  "Ideal Career Path", "Ideal Career Path Other", "Career Fair Expectations", "Career Fair Expectations Other",
+  "Career Tracks", "Skills Lab Resume Assistance", "Skills Lab Resume Assistance Other", "Resume Quality (1-5)",
+  "CV Uploaded", "Interview Confidence (1-5)", "Mock Interview", "How Heard About Career Fair", "How Heard Other",
+  "Attended Last Year", "Facilitator Questions"
+];
+
+function participantRow(p) {
+  return [
+    p.id, p.code, p.registrationType || "", p.registeredBeforeEvent === true ? "Yes" : "No", p.registeredAt || "",
+    p.checkedIn === true ? "Yes" : "No", p.checkedInAt || "", p.fullName, p.email, p.phone,
+    p.psghRegistrationNumber || "", p.yearOfCompletion || "", p.highestEducation || "", p.currentJobTitle || "",
+    p.currentAreaOfPractice || "", p.currentAreaOther || "", p.regionOfResidence || "",
+    p.idealCareerPath || "", p.idealCareerPathOther || "",
+    (p.careerFairExpectations || []).join(", "), p.careerFairExpectationsOther || "",
+    (p.careerTracks || []).join(", "), p.skillsLabResumeAssistance || "", p.skillsLabResumeAssistanceOther || "",
+    p.resumeQuality || "", p.cvUploaded === true ? "Yes" : "No", p.interviewConfidence || "",
+    p.mockInterview || "", p.heardAboutCareerFair || "", p.heardAboutCareerFairOther || "",
+    p.attendedLastYear || "", p.facilitatorQuestions || ""
+  ];
+}
+
+function sendConfirmationEmail(p) {
+  try {
+    if (!p || !p.email) {
+      Logger.log("Email error: missing email payload for " + (p && p.fullName ? p.fullName : "unknown attendee"));
+      return false;
+    }
+    const eventName = p.eventName || "Nexus Career Fair";
+    const fullName = p.fullName || "Attendee";
+    const code = p.code || "";
+    const subject = "Your " + eventName + " Registration Code";
+    const body = "Hello " + fullName + ",\n\n" +
+      "Your registration for " + eventName + " is confirmed.\n\n" +
+      "Your Registration Code is: " + code + "\n\n" +
+      "Keep this code handy. You will need it at the event entrance to check in, and you can use it in the event companion app to verify your booth sessions.\n\n" +
+      "We look forward to seeing you at the career fair!\n\n" +
+      eventName + " Team";
+    MailApp.sendEmail(p.email, subject, body);
+    Logger.log("Confirmation email sent to " + p.email);
+    return true;
+  } catch (err) {
+    Logger.log("Email error: " + err);
+    return false;
+  }
+}
+
 function setupSpreadsheet() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   
@@ -25,12 +98,8 @@ function setupSpreadsheet() {
     pSheet = ss.insertSheet("Participants");
   }
   if (pSheet.getLastRow() === 0) {
-    pSheet.appendRow([
-      "Participant ID", "Full Name", "Phone", "Email", "Institution", 
-      "Education Level", "Employment Status", "Career Interest", 
-      "Age Range", "Gender", "Referral Source", "Registration Time"
-    ]);
-    pSheet.getRange(1, 1, 1, 12).setBackground("#1e293b").setFontColor("#ffffff").setFontWeight("bold");
+    pSheet.appendRow(REGISTER_HEADERS);
+    pSheet.getRange(1, 1, 1, REGISTER_HEADERS.length).setBackground("#0a2240").setFontColor("#ffffff").setFontWeight("bold");
     pSheet.setFrozenRows(1);
   }
 
@@ -97,8 +166,12 @@ function setupSpreadsheet() {
   if (mSheet.getLastRow() === 0) {
     mSheet.appendRow(["Metric", "Calculated Value", "Notes"]);
     mSheet.appendRow(["Total Registered", '=COUNTA(Participants!A2:A)', "Total participant signups"]);
+    mSheet.appendRow(["Total Pre-Registrations", '=COUNTIF(Participants!C2:C, "pre_registration")', "Registrations before the event"]);
+    mSheet.appendRow(["Walk-In Registrations", '=COUNTIF(Participants!C2:C, "walk_in")', "Event-day registrations"]);
+    mSheet.appendRow(["Checked In", '=COUNTIF(Participants!F2:F, "Yes")', "Participants who checked in"]);
+    mSheet.appendRow(["Pre-Reg → Check-In Rate", '=IF(B3>0, TEXT(COUNTIFS(Participants!C2:C, "pre_registration", Participants!F2:F, "Yes")/B3, "0.0%"), "0%")', "Checked-in pre-registrations / pre-registrations"]);
     mSheet.appendRow(["Total Attended", '=COUNTA(Attendance!A2:A)', "Unique checked-in participants"]);
-    mSheet.appendRow(["Attendance Rate", '=IF(B2>0, TEXT(B3/B2, "0.0%"), "0%")', "Attendees / Registered"]);
+    mSheet.appendRow(["Attendance Rate", '=IF(B2>0, TEXT(B8/B2, "0.0%"), "0%")', "Attendees / Registered"]);
     mSheet.appendRow(["Total Booth Visits", '=COUNTA(\\'Booth Visits\\'!A2:A)', "Verified learning records"]);
     mSheet.appendRow(["Exit Surveys Submitted", '=COUNTA(Surveys!A2:A)', "Completed participant evaluations"]);
     mSheet.getRange(1, 1, 1, 3).setBackground("#0f172a").setFontColor("#ffffff").setFontWeight("bold");
@@ -113,14 +186,22 @@ function doPost(e) {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
 
     if (action === "register") {
-      const p = data.payload;
+      const p = data.payload || {};
       const sheet = ss.getSheetByName("Participants");
-      sheet.appendRow([
-        p.code, p.fullName, p.phone, p.email, p.institution,
-        p.educationLevel, p.employmentStatus, p.careerInterest,
-        p.ageRange || "", p.gender || "", p.referralSource || "", p.registeredAt
-      ]);
+      sheet.appendRow(participantRow(p));
+      sendConfirmationEmail(p);
       return createJsonResponse({ success: true, message: "Participant registered successfully", code: p.code });
+    }
+
+    if (action === "resendCode") {
+      const p = data.payload || {};
+      const sent = sendConfirmationEmail({
+        email: p.email,
+        fullName: p.fullName,
+        code: p.code,
+        eventName: p.eventName
+      });
+      return createJsonResponse({ success: sent, message: sent ? "Registration code email re-sent" : "Failed to send email (check recipient address)" });
     }
 
     if (action === "checkIn") {
@@ -157,9 +238,7 @@ function doPost(e) {
       // Overwrite or sync full state from dashboard
       const payload = data.payload;
       if (payload.participants) {
-        syncSheet(ss, "Participants", [
-          "Participant ID", "Full Name", "Phone", "Email", "Institution", "Education Level", "Employment Status", "Career Interest", "Age Range", "Gender", "Referral Source", "Registration Time"
-        ], payload.participants.map(p => [p.code, p.fullName, p.phone, p.email, p.institution, p.educationLevel, p.employmentStatus, p.careerInterest, p.ageRange || '', p.gender || '', p.referralSource || '', p.registeredAt]));
+        syncSheet(ss, "Participants", REGISTER_HEADERS, payload.participants.map(participantRow));
       }
       if (payload.attendance) {
         syncSheet(ss, "Attendance", [
@@ -257,10 +336,10 @@ function createJsonResponse(data) {
   }
 
   // Sends asynchronous Webhook payload if URL configured, with offline queue backup
-  static async sendWebhook(action: 'register' | 'checkIn' | 'boothVisit' | 'survey' | 'batchSync', payload: any): Promise<{ success: boolean; message?: string; error?: string }> {
+  static async sendWebhook(action: 'register' | 'checkIn' | 'boothVisit' | 'survey' | 'batchSync' | 'resendCode', payload: any): Promise<{ success: boolean; message?: string; error?: string; configured?: boolean }> {
     const config = StorageService.getConfig();
     if (!config.appsScriptWebhookUrl) {
-      return { success: true, message: "Saved locally (Google Apps Script Webhook not configured)." };
+      return { success: true, configured: false, message: "Saved locally (Google Apps Script Webhook not configured)." };
     }
 
     try {
@@ -277,7 +356,7 @@ function createJsonResponse(data) {
       // If we had queued items and this succeeded, attempt to flush them
       this.flushQueue();
 
-      return { success: true, message: "Synced automatically with Google Sheets" };
+      return { success: true, configured: true, message: "Synced automatically with Google Sheets" };
     } catch (err: any) {
       console.warn("Webhook sync deferred, queued for auto-retry:", err);
       // Queue action for retry when online
@@ -419,12 +498,8 @@ function createJsonResponse(data) {
     const surveys = StorageService.getSurveys();
 
     const participantRows = [
-      ["Participant ID", "Full Name", "Phone", "Email", "Institution", "Education Level", "Employment Status", "Career Interest", "Age Range", "Gender", "Referral Source", "Registration Time"],
-      ...participants.map(p => [
-        p.code, p.fullName, p.phone, p.email, p.institution,
-        p.educationLevel, p.employmentStatus, p.careerInterest,
-        p.ageRange || "", p.gender || "", p.referralSource || "", p.registeredAt
-      ])
+      PARTICIPANT_HEADERS,
+      ...participants.map(p => participantRow(p))
     ];
 
     const attendanceRows = [
@@ -450,8 +525,12 @@ function createJsonResponse(data) {
     const summaryRows = [
       ["Metric", "Calculated Value", "Notes"],
       ["Total Registered", '=COUNTA(Participants!A2:A)', "Total participant signups"],
+      ["Total Pre-Registrations", '=COUNTIF(Participants!C2:C, "pre_registration")', "Registrations before the event"],
+      ["Walk-In Registrations", '=COUNTIF(Participants!C2:C, "walk_in")', "Event-day registrations"],
+      ["Checked In", '=COUNTIF(Participants!F2:F, "Yes")', "Participants who checked in"],
+      ["Pre-Reg → Check-In Rate", '=IF(B3>0, TEXT(COUNTIFS(Participants!C2:C, "pre_registration", Participants!F2:F, "Yes")/B3, "0.0%"), "0%")', "Checked-in pre-registrations / pre-registrations"],
       ["Total Attended", '=COUNTA(Attendance!A2:A)', "Unique checked-in participants"],
-      ["Attendance Rate", '=IF(B2>0, TEXT(B3/B2, "0.0%"), "0%")', "Attendees / Registered"],
+      ["Attendance Rate", '=IF(B2>0, TEXT(B8/B2, "0.0%"), "0%")', "Attendees / Registered"],
       ["Total Booth Visits", '=COUNTA(\'Booth Visits\'!A2:A)', "Verified learning records"],
       ["Exit Surveys Submitted", '=COUNTA(Surveys!A2:A)', "Completed participant evaluations"]
     ];
@@ -459,7 +538,7 @@ function createJsonResponse(data) {
     const body = {
       valueInputOption: "USER_ENTERED",
       data: [
-        { range: "Participants!A1:L", values: participantRows },
+        { range: "Participants!A1:AF", values: participantRows },
         { range: "Attendance!A1:F", values: attendanceRows },
         { range: "Booths!A1:G", values: boothRows },
         { range: "'Booth Visits'!A1:J", values: visitRows },
@@ -508,8 +587,8 @@ function createJsonResponse(data) {
     // Export Master CSV
     const rows = [
       ["DATASET: PARTICIPANTS"],
-      ["Participant ID", "Full Name", "Phone", "Email", "Institution", "Education Level", "Employment Status", "Career Interest", "Registered At"],
-      ...participants.map(p => [p.code, p.fullName, p.phone, p.email, p.institution, p.educationLevel, p.employmentStatus, p.careerInterest, p.registeredAt]),
+      ["Participant ID", "Registration Code", "Registration Type", "Checked In", "Full Name", "Email", "Phone", "PSGH Registration Number", "Region", "Current Job Title", "Registered At"],
+      ...participants.map(p => [p.id, p.code, p.registrationType, p.checkedIn ? "Yes" : "No", p.fullName, p.email, p.phone, p.psghRegistrationNumber || "", p.regionOfResidence || "", p.currentJobTitle || "", p.registeredAt]),
       [],
       ["DATASET: ATTENDANCE"],
       ["Participant ID", "Participant Name", "Event", "Check In Time", "Status"],

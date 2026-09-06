@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Header } from './components/common/Header';
 import { WelcomeScreen } from './components/participant/WelcomeScreen';
-import { RegistrationForm } from './components/participant/RegistrationForm';
+import { PreRegistrationForm } from './components/participant/PreRegistrationForm';
 import { RegistrationSuccess } from './components/participant/RegistrationSuccess';
-import { CheckInScreen } from './components/participant/CheckInScreen';
+import { CodeCheckInScreen } from './components/participant/CodeCheckInScreen';
+import { WalkInRegistrationForm } from './components/participant/WalkInRegistrationForm';
+import { WalkInSuccessScreen } from './components/participant/WalkInSuccessScreen';
 import { ParticipantDashboard } from './components/participant/ParticipantDashboard';
 import { BoothDirectory } from './components/participant/BoothDirectory';
 import { ProgressView } from './components/participant/ProgressView';
@@ -17,9 +19,9 @@ import { AdminDashboard } from './components/admin/AdminDashboard';
 
 import { StorageService } from './services/storageService';
 import { GoogleSheetsService } from './services/googleSheetsService';
-import { Participant, EventConfig, Booth, BoothVisit, ExitSurvey } from './types';
-
-type ParticipantFlowScreen = 'welcome' | 'register' | 'registered_success' | 'checkin' | 'main';
+import { RegistrationService } from './services/registrationService';
+import { Participant, PreRegistrationData, WalkInRegistrationData, EventConfig, Booth, BoothVisit, ExitSurvey } from './types';
+import { usePathname, screenFromPath, SCREEN_PATHS, ADMIN_PATH, ParticipantFlowScreen } from './router';
 
 export default function App() {
   // Global event config & data
@@ -27,21 +29,25 @@ export default function App() {
   const [currentParticipant, setCurrentParticipant] = useState<Participant | null>(
     StorageService.getCurrentParticipant()
   );
-  const [isAdmin, setIsAdmin] = useState<boolean>(StorageService.isAdminLoggedIn());
+  const { pathname, navigate } = usePathname();
+  const [isAdmin, setIsAdmin] = useState<boolean>(
+    () => pathname === ADMIN_PATH && StorageService.isAdminLoggedIn()
+  );
 
-  // Participant flow states
+  // Participant flow states — derived from the current URL path
   const [flowScreen, setFlowScreen] = useState<ParticipantFlowScreen>(() => {
+    const s = screenFromPath(pathname);
     const current = StorageService.getCurrentParticipant();
-    if (!current) return 'welcome';
-    const isCheckedIn = StorageService.isParticipantCheckedIn(current.id);
-    return isCheckedIn ? 'main' : 'checkin';
+    if (!s || (['registered_success', 'walk_in_success', 'main'].includes(s) && !current)) {
+      return 'welcome';
+    }
+    return s;
   });
 
   const [activeTab, setActiveTab] = useState<ParticipantTab>('home');
   const [visits, setVisits] = useState<BoothVisit[]>(StorageService.getBoothVisits());
   const [booths, setBooths] = useState<Booth[]>(StorageService.getBooths());
   const [hasCompletedSurvey, setHasCompletedSurvey] = useState<boolean>(false);
-  const [sheetsRegisteredCount, setSheetsRegisteredCount] = useState<number | null>(null);
 
   // Modals
   const [isRecordModalOpen, setIsRecordModalOpen] = useState(false);
@@ -49,24 +55,7 @@ export default function App() {
   const [isSurveyModalOpen, setIsSurveyModalOpen] = useState(false);
   const [isAdminLoginOpen, setIsAdminLoginOpen] = useState(false);
   const [isEntranceQROpen, setIsEntranceQROpen] = useState(false);
-
-  // Fetch live count from Google Sheets Web App on mount and periodically
-  useEffect(() => {
-    let isMounted = true;
-    const fetchCount = async () => {
-      const summary = await GoogleSheetsService.fetchSheetSummary();
-      if (isMounted && summary && typeof summary.totalRegistered === 'number') {
-        setSheetsRegisteredCount(summary.totalRegistered);
-      }
-    };
-
-    fetchCount();
-    const interval = setInterval(fetchCount, 30000); // refresh every 30s
-    return () => {
-      isMounted = false;
-      clearInterval(interval);
-    };
-  }, [config.appsScriptWebhookUrl]);
+  const [registrationEmailStatus, setRegistrationEmailStatus] = useState<'pending' | 'sent' | 'not_configured' | 'failed'>('pending');
 
   // Initialize automatic background sync lifecycle
   useEffect(() => {
@@ -83,24 +72,71 @@ export default function App() {
     }
   }, [currentParticipant]);
 
-  // Handle participant registration
-  const handleRegisterParticipant = async (data: Omit<Participant, 'id' | 'code' | 'registeredAt'>) => {
-    const newParticipant = StorageService.registerParticipant(data);
-    setCurrentParticipant(newParticipant);
-    setFlowScreen('registered_success');
-
-    // Async sync automatically to Google Sheets
-    GoogleSheetsService.sendWebhook('register', newParticipant);
+  // Navigate to a flow screen and keep the URL path in sync
+  const goTo = (screen: ParticipantFlowScreen) => {
+    setFlowScreen(screen);
+    navigate(SCREEN_PATHS[screen]);
   };
 
-  // Handle event check-in
-  const handleCheckIn = () => {
-    if (!currentParticipant) return;
-    const record = StorageService.checkInParticipant(currentParticipant.id);
-    setFlowScreen('main');
+  // Keep state in sync when the URL changes (browser back/forward, direct link)
+  useEffect(() => {
+    if (pathname === ADMIN_PATH) {
+      if (StorageService.isAdminLoggedIn()) {
+        setIsAdmin(true);
+      } else {
+        setIsAdminLoginOpen(true);
+      }
+      return;
+    }
 
-    // Async sync automatically to Google Sheets
-    GoogleSheetsService.sendWebhook('checkIn', record);
+    if (isAdmin) setIsAdmin(false);
+    const s = screenFromPath(pathname);
+    if (s && ['registered_success', 'walk_in_success', 'main'].includes(s) && !StorageService.getCurrentParticipant()) {
+      goTo('welcome');
+      return;
+    }
+    setFlowScreen(s ?? 'welcome');
+  }, [pathname, isAdmin]);
+
+  // Handle pre-registration (full questionnaire)
+  const handleRegisterParticipant = async (data: PreRegistrationData) => {
+    const newParticipant = RegistrationService.createPreRegistration(data);
+    setCurrentParticipant(newParticipant);
+    setRegistrationEmailStatus('pending');
+    goTo('registered_success');
+
+    // Async: update Google Sheets + email the registration code
+    const res = await RegistrationService.syncRegistration(newParticipant);
+    if (res.success && res.configured === false) {
+      setRegistrationEmailStatus('not_configured');
+    } else if (res.success) {
+      setRegistrationEmailStatus('sent');
+    } else {
+      setRegistrationEmailStatus('failed');
+    }
+  };
+
+  // Handle event-day walk-in registration (checked in immediately)
+  const handleWalkInRegistration = async (data: WalkInRegistrationData) => {
+    const newParticipant = RegistrationService.registerWalkIn(data);
+    setCurrentParticipant(newParticipant);
+    goTo('walk_in_success');
+
+    // Async: update Google Sheets + email the registration code
+    RegistrationService.syncRegistration(newParticipant);
+  };
+
+  // Handle verified code check-in
+  const handleCheckInSuccess = (participant: Participant) => {
+    StorageService.setCurrentParticipantId(participant.id);
+    setCurrentParticipant(participant);
+    goTo('main');
+
+    // Async sync attendance to Google Sheets
+    const record = StorageService.getAttendance().find(a => a.participantId === participant.id && a.status === "Checked In");
+    if (record) {
+      GoogleSheetsService.sendWebhook('checkIn', record);
+    }
   };
 
   // Handle successful booth visit recording
@@ -132,7 +168,7 @@ export default function App() {
   const handleSignOut = () => {
     StorageService.setCurrentParticipantId(null);
     setCurrentParticipant(null);
-    setFlowScreen('welcome');
+    goTo('welcome');
     setActiveTab('home');
   };
 
@@ -141,6 +177,7 @@ export default function App() {
     if (isAdmin) {
       StorageService.setAdminLoggedIn(false);
       setIsAdmin(false);
+      goTo('welcome');
     } else {
       setIsAdminLoginOpen(true);
     }
@@ -149,20 +186,23 @@ export default function App() {
   const handleAdminLoginSuccess = () => {
     StorageService.setAdminLoggedIn(true);
     setIsAdmin(true);
+    navigate(ADMIN_PATH);
   };
 
   const verifiedVisitsCount = visits.filter(v => v.verificationStatus === 'verified').length;
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-indigo-500 selection:text-white">
-      {/* Top Application Header */}
-      <Header
-        config={config}
-        isAdmin={isAdmin}
-        onToggleAdmin={handleToggleAdmin}
-        onOpenEntranceQR={() => setIsEntranceQROpen(true)}
-        currentParticipantName={currentParticipant?.fullName}
-      />
+    <div className="min-h-screen bg-navy text-mist flex flex-col selection:bg-orange selection:text-navy">
+      {/* Top Application Header — hidden on the standalone pre-registration page */}
+      {flowScreen !== 'register' && (
+        <Header
+          config={config}
+          isAdmin={isAdmin}
+          onToggleAdmin={handleToggleAdmin}
+          onOpenEntranceQR={() => setIsEntranceQROpen(true)}
+          currentParticipantName={currentParticipant?.fullName}
+        />
+      )}
 
       {/* Main Content View Container */}
       <main className="flex-1">
@@ -177,6 +217,7 @@ export default function App() {
             onExitAdmin={() => {
               StorageService.setAdminLoggedIn(false);
               setIsAdmin(false);
+              goTo('welcome');
             }}
           />
         ) : (
@@ -185,26 +226,25 @@ export default function App() {
             {flowScreen === 'welcome' && (
               <WelcomeScreen
                 config={config}
-                onStartRegistration={() => setFlowScreen('register')}
-                totalRegistered={sheetsRegisteredCount !== null ? sheetsRegisteredCount : StorageService.getParticipants().length}
-                isFromSheets={sheetsRegisteredCount !== null}
+                onPreRegistered={() => goTo('checkin')}
+                onWalkIn={() => goTo('walk_in')}
+                onPreRegisterOnline={() => goTo('register')}
                 lastParticipant={StorageService.getCurrentParticipant()}
                 onResumeSession={() => {
                   const saved = StorageService.getCurrentParticipant();
                   if (saved) {
                     setCurrentParticipant(saved);
                     const isCheckedIn = StorageService.isParticipantCheckedIn(saved.id);
-                    setFlowScreen(isCheckedIn ? 'main' : 'checkin');
+                    goTo(isCheckedIn ? 'main' : 'checkin');
                   }
                 }}
               />
             )}
 
             {flowScreen === 'register' && (
-              <RegistrationForm
-                config={config}
+              <PreRegistrationForm
                 onSubmit={handleRegisterParticipant}
-                onCancel={() => setFlowScreen('welcome')}
+                onCancel={() => goTo('welcome')}
               />
             )}
 
@@ -212,15 +252,35 @@ export default function App() {
               <RegistrationSuccess
                 participant={currentParticipant}
                 config={config}
-                onProceedToCheckIn={() => setFlowScreen('checkin')}
+                emailStatus={registrationEmailStatus}
+                onContinue={() => goTo('welcome')}
+                onProceedToCheckIn={() => goTo('checkin')}
               />
             )}
 
-            {flowScreen === 'checkin' && currentParticipant && (
-              <CheckInScreen
+            {flowScreen === 'checkin' && (
+              <CodeCheckInScreen
+                config={config}
+                initialParticipant={currentParticipant}
+                onSuccess={handleCheckInSuccess}
+                onBack={() => goTo('welcome')}
+                onRegisterInPerson={() => goTo('walk_in')}
+              />
+            )}
+
+            {flowScreen === 'walk_in' && (
+              <WalkInRegistrationForm
+                onSubmit={handleWalkInRegistration}
+                onCancel={() => goTo('welcome')}
+              />
+            )}
+
+            {flowScreen === 'walk_in_success' && currentParticipant && (
+              <WalkInSuccessScreen
                 participant={currentParticipant}
                 config={config}
-                onCheckInSuccess={handleCheckIn}
+                emailStatus={registrationEmailStatus}
+                onContinue={() => goTo('main')}
               />
             )}
 
@@ -272,7 +332,7 @@ export default function App() {
                     onRegisterNew={() => {
                       StorageService.setCurrentParticipantId(null);
                       setCurrentParticipant(null);
-                      setFlowScreen('register');
+                      goTo('walk_in');
                     }}
                   />
                 )}

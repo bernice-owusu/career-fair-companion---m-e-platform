@@ -72,26 +72,26 @@ export const RecordBoothVisitModal: React.FC<RecordBoothVisitModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy/80 backdrop-blur-sm animate-fadeIn">
+      <div className="bg-navy border border-mist/15 rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between">
+        <div className="p-4 sm:p-5 border-b border-mist/15 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-indigo-600/20 text-indigo-400 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-orange/20 text-orange flex items-center justify-center">
               <ShieldCheck className="w-4 h-4" />
             </div>
             <div>
               <h2 className="text-sm sm:text-base font-bold text-white">
                 Record Booth Visit
               </h2>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-[11px] text-mist/60">
                 Verify session with facilitator code
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+            className="p-1.5 rounded-lg text-mist/60 hover:text-white hover:bg-navy/60 transition"
           >
             <X className="w-5 h-5" />
           </button>
@@ -102,28 +102,28 @@ export const RecordBoothVisitModal: React.FC<RecordBoothVisitModalProps> = ({
           {verifiedVisit ? (
             /* Success Verified Screen */
             <div className="text-center py-6 space-y-4">
-              <div className="w-16 h-16 rounded-full bg-emerald-500/20 border-2 border-emerald-500/50 flex items-center justify-center text-emerald-400 mx-auto">
+              <div className="w-16 h-16 rounded-full bg-teal/20 border-2 border-teal/50 flex items-center justify-center text-mist mx-auto">
                 <CheckCircle2 className="w-8 h-8" />
               </div>
               <div className="space-y-1">
                 <h3 className="text-xl font-bold text-white">✓ Booth Completed!</h3>
-                <p className="text-xs text-slate-300">
+                <p className="text-xs text-mist/80">
                   Your visit to <strong className="text-white">{verifiedVisit.boothName}</strong> has been officially verified.
                 </p>
               </div>
 
-              <div className="bg-slate-950 rounded-2xl p-4 border border-slate-800 text-left space-y-2 text-xs">
+              <div className="bg-navy rounded-2xl p-4 border border-mist/15 text-left space-y-2 text-xs">
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Facilitator</span>
-                  <span className="font-semibold text-slate-200">{verifiedVisit.facilitator}</span>
+                  <span className="text-mist/60">Facilitator</span>
+                  <span className="font-semibold text-mist">{verifiedVisit.facilitator}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Verified Code</span>
-                  <span className="font-mono font-bold text-indigo-400">{verifiedVisit.boothCode}</span>
+                  <span className="text-mist/60">Verified Code</span>
+                  <span className="font-mono font-bold text-orange">{verifiedVisit.boothCode}</span>
                 </div>
-                <div className="pt-2 border-t border-slate-800">
-                  <span className="text-slate-400 block mb-1">Your Learning Reflection:</span>
-                  <p className="text-slate-300 italic">"{verifiedVisit.reflection}"</p>
+                <div className="pt-2 border-t border-mist/15">
+                  <span className="text-mist/60 block mb-1">Your Learning Reflection:</span>
+                  <p className="text-mist/80 italic">"{verifiedVisit.reflection}"</p>
                 </div>
               </div>
 
@@ -132,7 +132,7 @@ export const RecordBoothVisitModal: React.FC<RecordBoothVisitModalProps> = ({
                   onSuccess(verifiedVisit);
                   onClose();
                 }}
-                className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm shadow-lg shadow-emerald-600/30 transition"
+                className="w-full py-3.5 px-4 rounded-xl bg-teal hover:bg-teal/90 text-white font-bold text-sm shadow-lg shadow-teal/30 transition"
               >
                 Explore More Booths
               </button>
@@ -152,7 +152,7 @@ export const RecordBoothVisitModal: React.FC<RecordBoothVisitModalProps> = ({
 
               {/* Step 1: Select Booth */}
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-indigo-400 mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-orange mb-1.5">
                   1. Which booth did you attend? <span className="text-rose-400">*</span>
                 </label>
                 <select
@@ -161,7 +161,7 @@ export const RecordBoothVisitModal: React.FC<RecordBoothVisitModalProps> = ({
                     setSelectedBoothId(e.target.value);
                     setErrorMsg('');
                   }}
-                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500"
+                  className="w-full px-3.5 py-2.5 bg-navy border border-mist/25 rounded-xl text-sm text-white focus:outline-none focus:border-orange"
                 >
                   {booths.map((b) => (
                     <option key={b.id} value={b.id}>
@@ -170,7 +170,7 @@ export const RecordBoothVisitModal: React.FC<RecordBoothVisitModalProps> = ({
                   ))}
                 </select>
                 {currentBooth && (
-                  <p className="text-[11px] text-slate-400 mt-1">
+                  <p className="text-[11px] text-mist/60 mt-1">
                     {currentBooth.description}
                   </p>
                 )}
@@ -178,7 +178,7 @@ export const RecordBoothVisitModal: React.FC<RecordBoothVisitModalProps> = ({
 
               {/* Step 2: Booth Code */}
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-indigo-400 mb-1.5 flex items-center gap-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-orange mb-1.5 flex items-center gap-1.5">
                   <Key className="w-3.5 h-3.5" />
                   <span>2. Enter Booth Code</span> <span className="text-rose-400">*</span>
                 </label>
@@ -190,16 +190,16 @@ export const RecordBoothVisitModal: React.FC<RecordBoothVisitModalProps> = ({
                     setBoothCode(e.target.value.toUpperCase());
                     setErrorMsg('');
                   }}
-                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white font-mono uppercase tracking-wider placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                  className="w-full px-3.5 py-2.5 bg-navy border border-mist/25 rounded-xl text-sm text-white font-mono uppercase tracking-wider placeholder-mist/40 focus:outline-none focus:border-orange"
                 />
-                <p className="text-[11px] text-slate-400 mt-1">
+                <p className="text-[11px] text-mist/60 mt-1">
                   Ask the facilitator at the booth for the official verification code.
                 </p>
               </div>
 
               {/* Step 3: Facilitator Selection (Prevents typos!) */}
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-indigo-400 mb-1.5 flex items-center gap-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-orange mb-1.5 flex items-center gap-1.5">
                   <User className="w-3.5 h-3.5" />
                   <span>3. Who facilitated this session?</span> <span className="text-rose-400">*</span>
                 </label>
@@ -209,8 +209,8 @@ export const RecordBoothVisitModal: React.FC<RecordBoothVisitModalProps> = ({
                       key={fac}
                       className={`flex items-center gap-3 p-2.5 rounded-xl border cursor-pointer transition ${
                         selectedFacilitator === fac
-                          ? 'bg-indigo-950/60 border-indigo-500 text-white'
-                          : 'bg-slate-950/60 border-slate-800 text-slate-300 hover:border-slate-700'
+                          ? 'bg-orange/15 border-orange text-white'
+                          : 'bg-navy/60 border-mist/15 text-mist/80 hover:border-mist/30'
                       }`}
                     >
                       <input
@@ -222,7 +222,7 @@ export const RecordBoothVisitModal: React.FC<RecordBoothVisitModalProps> = ({
                           setSelectedFacilitator(fac);
                           setErrorMsg('');
                         }}
-                        className="text-indigo-600 focus:ring-indigo-500"
+                        className="text-orange focus:ring-orange"
                       />
                       <span className="text-xs sm:text-sm font-semibold">{fac}</span>
                     </label>
@@ -233,11 +233,11 @@ export const RecordBoothVisitModal: React.FC<RecordBoothVisitModalProps> = ({
               {/* Step 4: Learning Reflection */}
               <div>
                 <div className="flex justify-between items-center mb-1.5">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-orange flex items-center gap-1.5">
                     <MessageSquare className="w-3.5 h-3.5" />
                     <span>4. What did you learn from this booth?</span> <span className="text-rose-400">*</span>
                   </label>
-                  <span className={`text-[10px] font-mono ${reflection.length > 280 ? 'text-amber-400' : 'text-slate-400'}`}>
+                  <span className={`text-[10px] font-mono ${reflection.length > 280 ? 'text-orange' : 'text-mist/60'}`}>
                     {reflection.length}/300
                   </span>
                 </div>
@@ -250,13 +250,13 @@ export const RecordBoothVisitModal: React.FC<RecordBoothVisitModalProps> = ({
                     setReflection(e.target.value);
                     setErrorMsg('');
                   }}
-                  className="w-full px-3.5 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 resize-none"
+                  className="w-full px-3.5 py-2 bg-navy border border-mist/25 rounded-xl text-sm text-white placeholder-mist/40 focus:outline-none focus:border-orange resize-none"
                 />
               </div>
 
               {/* Confirmation Preview */}
-              <div className="bg-slate-950/70 border border-slate-800/80 rounded-2xl p-3.5 space-y-1.5 text-xs text-slate-300">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+              <div className="bg-navy/70 border border-mist/15 rounded-2xl p-3.5 space-y-1.5 text-xs text-mist/80">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-mist/60 block mb-1">
                   Summary to Submit:
                 </span>
                 <p><strong>Booth:</strong> {currentBooth?.name}</p>
@@ -269,7 +269,7 @@ export const RecordBoothVisitModal: React.FC<RecordBoothVisitModalProps> = ({
                 type="button"
                 onClick={handleSubmit}
                 disabled={isSubmitting || !boothCode.trim() || !reflection.trim()}
-                className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/30 transition flex items-center justify-center gap-2 disabled:opacity-50"
+                className="w-full py-3.5 px-4 rounded-xl bg-orange hover:bg-orange/90 text-white font-bold text-sm shadow-lg shadow-orange/30 transition flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 {isSubmitting ? (
                   <span className="flex items-center gap-2">

@@ -29,7 +29,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur-lg border-t border-slate-800 pb-safe">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-navy/95 backdrop-blur-lg border-t border-mist/15 pb-safe">
       <div className="max-w-md mx-auto flex items-center justify-around px-2 py-2">
         {tabs.map((tab) => {
           const Icon = tab.icon;
@@ -40,8 +40,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({
               onClick={() => onChangeTab(tab.id)}
               className={`relative flex flex-col items-center justify-center w-16 py-1.5 rounded-xl transition-all ${
                 isActive
-                  ? 'text-indigo-400 font-semibold'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'text-orange font-semibold'
+                  : 'text-mist/60 hover:text-mist'
               }`}
             >
               <div className="relative">
@@ -49,8 +49,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({
                 {tab.badge && (
                   <span className={`absolute -top-1.5 -right-3 text-[10px] font-bold px-1.5 py-0.2 rounded-full ${
                     completedBoothsCount >= minRequired
-                      ? 'bg-emerald-500 text-slate-950'
-                      : 'bg-indigo-600 text-white'
+                      ? 'bg-teal text-navy'
+                      : 'bg-orange text-white'
                   }`}>
                     {tab.badge}
                   </span>
@@ -58,7 +58,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
               </div>
               <span className="text-[11px] mt-1 tracking-tight">{tab.label}</span>
               {isActive && (
-                <span className="absolute bottom-0 w-8 h-0.5 bg-indigo-500 rounded-full"></span>
+                <span className="absolute bottom-0 w-8 h-0.5 bg-orange rounded-full"></span>
               )}
             </button>
           );

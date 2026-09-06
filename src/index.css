@@ -1,5 +1,16 @@
 @import "tailwindcss";
 
+@theme {
+  --color-navy: #0a2240;
+  --color-orange: #ff5c35;
+  --color-blue: #135eab;
+  --color-teal: #004f51;
+  --color-mist: #dce3eb;
+
+  --font-headline: 'Myriad Pro Black', 'Myriad Pro', 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Gill Sans Std', 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+}
+
 @layer utilities {
   .pb-safe {
     padding-bottom: env(safe-area-inset-bottom, 1rem);
@@ -22,6 +33,17 @@
 }
 
 body {
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-body);
+  background-color: var(--color-navy);
+  color: var(--color-mist);
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-headline);
+  font-weight: 900;
+}

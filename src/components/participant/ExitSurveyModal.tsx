@@ -55,26 +55,26 @@ export const ExitSurveyModal: React.FC<ExitSurveyModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy/80 backdrop-blur-sm animate-fadeIn">
+      <div className="bg-navy border border-mist/15 rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between">
+        <div className="p-4 sm:p-5 border-b border-mist/15 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
-              <Star className="w-4 h-4 fill-amber-400" />
+            <div className="w-8 h-8 rounded-xl bg-orange/20 text-orange flex items-center justify-center">
+              <Star className="w-4 h-4 fill-orange" />
             </div>
             <div>
               <h2 className="text-sm sm:text-base font-bold text-white">
                 Career Fair Exit Survey
               </h2>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-[11px] text-mist/60">
                 Help the M&E team evaluate today's impact
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+            className="p-1.5 rounded-lg text-mist/60 hover:text-white hover:bg-navy/60 transition"
           >
             <X className="w-5 h-5" />
           </button>
@@ -84,12 +84,12 @@ export const ExitSurveyModal: React.FC<ExitSurveyModalProps> = ({
         <div className="p-5 overflow-y-auto space-y-5 flex-1">
           {submitted ? (
             <div className="text-center py-8 space-y-4">
-              <div className="w-16 h-16 rounded-full bg-emerald-500/20 border-2 border-emerald-500/50 flex items-center justify-center text-emerald-400 mx-auto">
+              <div className="w-16 h-16 rounded-full bg-teal/20 border-2 border-teal/50 flex items-center justify-center text-mist mx-auto">
                 <CheckCircle2 className="w-8 h-8" />
               </div>
               <div className="space-y-1">
                 <h3 className="text-xl font-bold text-white">Thank You for Your Feedback! 🎉</h3>
-                <p className="text-xs text-slate-300 max-w-sm mx-auto">
+                <p className="text-xs text-mist/80 max-w-sm mx-auto">
                   Your responses have been recorded in the central M&E dataset. Have a wonderful rest of the day!
                 </p>
               </div>
@@ -100,7 +100,7 @@ export const ExitSurveyModal: React.FC<ExitSurveyModalProps> = ({
                   }
                   onClose();
                 }}
-                className="w-full py-3.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-lg shadow-emerald-600/30 transition"
+                className="w-full py-3.5 px-4 rounded-xl bg-teal hover:bg-teal/90 text-white font-bold text-sm shadow-lg shadow-teal/30 transition"
               >
                 Back to Dashboard
               </button>
@@ -108,7 +108,7 @@ export const ExitSurveyModal: React.FC<ExitSurveyModalProps> = ({
           ) : (
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* Question 1: Overall Experience */}
-              <div className="bg-slate-950/70 border border-slate-800 rounded-2xl p-4 space-y-2">
+              <div className="bg-navy/70 border border-mist/15 rounded-2xl p-4 space-y-2">
                 <label className="block text-xs font-bold text-white">
                   1. How useful was the career fair overall? <span className="text-rose-400">*</span>
                 </label>
@@ -120,23 +120,23 @@ export const ExitSurveyModal: React.FC<ExitSurveyModalProps> = ({
                       onClick={() => setOverallRating(star)}
                       className={`flex-1 py-2 rounded-xl flex flex-col items-center gap-1 border transition ${
                         overallRating >= star
-                          ? 'bg-amber-500/20 border-amber-500 text-amber-400'
-                          : 'bg-slate-900 border-slate-800 text-slate-500 hover:border-slate-700'
+                          ? 'bg-orange/20 border-orange text-orange'
+                          : 'bg-navy border-mist/15 text-mist/40 hover:border-mist/30'
                       }`}
                     >
-                      <Star className={`w-5 h-5 ${overallRating >= star ? 'fill-amber-400 text-amber-400' : ''}`} />
+                      <Star className={`w-5 h-5 ${overallRating >= star ? 'fill-orange text-orange' : ''}`} />
                       <span className="text-[10px] font-bold">{star}</span>
                     </button>
                   ))}
                 </div>
-                <div className="flex justify-between text-[10px] text-slate-500 px-1">
+                <div className="flex justify-between text-[10px] text-mist/40 px-1">
                   <span>1 - Not Useful</span>
                   <span>5 - Extremely Useful</span>
                 </div>
               </div>
 
               {/* Question 2: Career Readiness Confidence */}
-              <div className="bg-slate-950/70 border border-slate-800 rounded-2xl p-4 space-y-2">
+              <div className="bg-navy/70 border border-mist/15 rounded-2xl p-4 space-y-2">
                 <label className="block text-xs font-bold text-white">
                   2. How confident do you feel about your career readiness after today's event? <span className="text-rose-400">*</span>
                 </label>
@@ -148,30 +148,30 @@ export const ExitSurveyModal: React.FC<ExitSurveyModalProps> = ({
                       onClick={() => setConfidenceRating(level)}
                       className={`flex-1 py-2 rounded-xl flex flex-col items-center gap-1 border transition ${
                         confidenceRating >= level
-                          ? 'bg-indigo-500/20 border-indigo-500 text-indigo-400'
-                          : 'bg-slate-900 border-slate-800 text-slate-500 hover:border-slate-700'
+                          ? 'bg-orange/20 border-orange text-orange'
+                          : 'bg-navy border-mist/15 text-mist/40 hover:border-mist/30'
                       }`}
                     >
-                      <ThumbsUp className={`w-4 h-4 ${confidenceRating >= level ? 'text-indigo-400' : ''}`} />
+                      <ThumbsUp className={`w-4 h-4 ${confidenceRating >= level ? 'text-orange' : ''}`} />
                       <span className="text-[10px] font-bold">{level}</span>
                     </button>
                   ))}
                 </div>
-                <div className="flex justify-between text-[10px] text-slate-500 px-1">
+                <div className="flex justify-between text-[10px] text-mist/40 px-1">
                   <span>1 - Low Confidence</span>
                   <span>5 - Very Confident</span>
                 </div>
               </div>
 
               {/* Question 3: Most Useful Booth */}
-              <div className="bg-slate-950/70 border border-slate-800 rounded-2xl p-4 space-y-2">
+              <div className="bg-navy/70 border border-mist/15 rounded-2xl p-4 space-y-2">
                 <label className="block text-xs font-bold text-white">
                   3. Which booth did you find MOST useful today? <span className="text-rose-400">*</span>
                 </label>
                 <select
                   value={mostUsefulBoothId}
                   onChange={(e) => setMostUsefulBoothId(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500"
+                  className="w-full px-3.5 py-2.5 bg-navy border border-mist/25 rounded-xl text-sm text-white focus:outline-none focus:border-orange"
                 >
                   {booths.map((b) => (
                     <option key={b.id} value={b.id}>
@@ -182,7 +182,7 @@ export const ExitSurveyModal: React.FC<ExitSurveyModalProps> = ({
               </div>
 
               {/* Question 4: Most Important Thing Learned */}
-              <div className="bg-slate-950/70 border border-slate-800 rounded-2xl p-4 space-y-2">
+              <div className="bg-navy/70 border border-mist/15 rounded-2xl p-4 space-y-2">
                 <label className="block text-xs font-bold text-white">
                   4. What is the most important thing you learned today?
                 </label>
@@ -191,12 +191,12 @@ export const ExitSurveyModal: React.FC<ExitSurveyModalProps> = ({
                   placeholder="e.g. Using the STAR framework for interview answers..."
                   value={keyLearning}
                   onChange={(e) => setKeyLearning(e.target.value)}
-                  className="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 resize-none"
+                  className="w-full px-3.5 py-2 bg-navy border border-mist/25 rounded-xl text-sm text-white placeholder-mist/40 focus:outline-none focus:border-orange resize-none"
                 />
               </div>
 
               {/* Question 5: Improvement Feedback */}
-              <div className="bg-slate-950/70 border border-slate-800 rounded-2xl p-4 space-y-2">
+              <div className="bg-navy/70 border border-mist/15 rounded-2xl p-4 space-y-2">
                 <label className="block text-xs font-bold text-white">
                   5. What could we improve for future career fairs?
                 </label>
@@ -205,7 +205,7 @@ export const ExitSurveyModal: React.FC<ExitSurveyModalProps> = ({
                   placeholder="e.g. Longer Q&A time at tech booths, additional company stands..."
                   value={improvement}
                   onChange={(e) => setImprovement(e.target.value)}
-                  className="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 resize-none"
+                  className="w-full px-3.5 py-2 bg-navy border border-mist/25 rounded-xl text-sm text-white placeholder-mist/40 focus:outline-none focus:border-orange resize-none"
                 />
               </div>
 
@@ -213,11 +213,11 @@ export const ExitSurveyModal: React.FC<ExitSurveyModalProps> = ({
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-amber-500 to-indigo-600 hover:from-amber-400 hover:to-indigo-500 text-slate-950 hover:text-white font-bold text-base shadow-xl transition flex items-center justify-center gap-2"
+                className="w-full py-4 px-6 rounded-xl bg-orange hover:bg-orange/90 text-navy hover:text-white font-bold text-base shadow-xl transition flex items-center justify-center gap-2"
               >
                 {isSubmitting ? (
                   <span className="flex items-center gap-2">
-                    <span className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin"></span>
+                    <span className="w-4 h-4 border-2 border-navy border-t-transparent rounded-full animate-spin"></span>
                     Submitting Survey...
                   </span>
                 ) : (

@@ -1,6 +1,7 @@
-import React from 'react';
-import { Sparkles, Shield, User, QrCode } from 'lucide-react';
-import { EventConfig } from '../../types';
+import React from "react";
+import { Shield, User, QrCode } from "lucide-react";
+import { EventConfig } from "../../types";
+import logo from "@/assets/logo.png";
 
 interface HeaderProps {
   config: EventConfig;
@@ -18,20 +19,26 @@ export const Header: React.FC<HeaderProps> = ({
   currentParticipantName,
 }) => {
   return (
-    <header className="sticky top-0 z-30 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 text-white px-4 py-3 sm:px-6">
+    <header className="sticky top-0 z-30 bg-navy/90 backdrop-blur-md border-b border-mist/15 text-white px-4 py-3 sm:px-6">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
         {/* Left Branding */}
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center shadow-md shadow-indigo-500/20 shrink-0">
-            <Sparkles className="w-5 h-5 text-white" />
-          </div>
+          <img
+            src={logo}
+            alt={`${config.eventName} logo`}
+            className="w-9 h-9 rounded-lg object-contain bg-navy shadow-md shadow-orange/20 border border-mist/15 shrink-0"
+          />
           <div className="min-w-0">
-            <h1 className="text-sm sm:text-base font-bold text-slate-100 truncate tracking-tight">
+            <h1 className="text-sm sm:text-base font-bold text-mist truncate tracking-tight">
               {config.eventName}
             </h1>
-            <p className="text-[11px] sm:text-xs text-slate-400 flex items-center gap-1.5 truncate">
-              <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              {isAdmin ? 'M&E Monitoring Center' : (currentParticipantName ? `Participant: ${currentParticipantName}` : 'Digital Companion & PWA')}
+            <p className="text-[11px] sm:text-xs text-mist/60 flex items-center gap-1.5 truncate">
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-teal animate-pulse"></span>
+              {isAdmin
+                ? "M&E Monitoring Center"
+                : currentParticipantName
+                  ? `Participant: ${currentParticipantName}`
+                  : "Digital Companion & PWA"}
             </p>
           </div>
         </div>
@@ -42,19 +49,20 @@ export const Header: React.FC<HeaderProps> = ({
           {/* <button
             onClick={onOpenEntranceQR}
             title="Show Entrance QR Code"
-            className="flex items-center gap-1.5 text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1.5 rounded-lg border border-slate-700 transition"
+            className="flex items-center gap-1.5 text-xs font-medium bg-navy/70 hover:bg-navy/80 text-mist px-2.5 py-1.5 rounded-lg border border-mist/25 transition"
           >
-            <QrCode className="w-3.5 h-3.5 text-indigo-400" />
+            <QrCode className="w-3.5 h-3.5 text-orange" />
             <span className="hidden sm:inline">Entrance QR</span>
           </button> */}
 
           {/* Role Switcher */}
           <button
             onClick={onToggleAdmin}
-            className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition shadow-sm ${isAdmin
-              ? 'bg-indigo-600 text-white hover:bg-indigo-500 shadow-indigo-600/30'
-              : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700'
-              }`}
+            className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition shadow-sm ${
+              isAdmin
+                ? "bg-orange text-white hover:bg-orange/90 shadow-orange/30"
+                : "bg-navy/70 hover:bg-navy/80 text-mist border border-mist/25"
+            }`}
           >
             {isAdmin ? (
               <>
@@ -63,7 +71,7 @@ export const Header: React.FC<HeaderProps> = ({
               </>
             ) : (
               <>
-                <Shield className="w-3.5 h-3.5 text-indigo-400" />
+                <Shield className="w-3.5 h-3.5 text-orange" />
                 <span>M&E Admin</span>
               </>
             )}
@@ -73,4 +81,3 @@ export const Header: React.FC<HeaderProps> = ({
     </header>
   );
 };
-

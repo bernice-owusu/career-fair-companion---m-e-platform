@@ -1,4 +1,7 @@
-import { Participant, AttendanceRecord, Booth, BoothVisit, ExitSurvey, EventConfig, MneMetrics } from '../types';
+import { Participant, PreRegistrationData, WalkInRegistrationData, AttendanceRecord, Booth, BoothVisit, ExitSurvey, EventConfig, MneMetrics } from '../types';
+import { CODE_ALPHABET, CODE_DIGITS } from '../registrationOptions';
+
+export const CODE_PREFIX = 'NEXUS-';
 
 const STORAGE_KEYS = {
   PARTICIPANTS: 'kcf_participants_v1',
@@ -10,12 +13,13 @@ const STORAGE_KEYS = {
   CURRENT_USER_ID: 'kcf_current_participant_id_v1',
   ADMIN_SESSION: 'kcf_admin_logged_in_v1',
   GOOGLE_ACCESS_TOKEN: 'kcf_google_access_token_v1',
+  BOOTH_SEED_VERSION: 'kcf_booths_seed_version_v1',
 };
 
 export const DEFAULT_CONFIG: EventConfig = {
   eventName: "Nexus Career Fair 2026",
-  eventDate: "2026-08-22",
-  eventLocation: "Grand Exhibition Center, Main Auditorium",
+  eventDate: "2026-09-25",
+  eventLocation: "University of Ghana Campus, Accra",
   minBoothsRequired: 4,
   adminPasscode: "mne2026",
   googleSpreadsheetId: "",
@@ -51,72 +55,137 @@ export const DEFAULT_CONFIG: EventConfig = {
 
 export const INITIAL_BOOTHS: Booth[] = [
   {
-    id: "booth-cv",
-    name: "CV & Cover Letter Masterclass",
-    description: "Learn how to format ATS-friendly resumes, highlight measurable achievements, and tailor compelling cover letters.",
-    location: "Hall A — Booth 1",
-    facilitators: ["Ama Mensah", "Kwame Asare"],
-    boothCode: "CV4827",
+    id: "booth-international-development",
+    name: "International Development",
+    description: "Explore global health initiatives, NGO and multilateral careers, and how pharmacists shape international development programmes.",
+    location: "Exhibition Hall A",
+    facilitators: ["Aristotle John Nikoi"],
+    boothCode: "INT827",
     isActive: true,
-    category: "Job Readiness"
+    category: "Career Track"
   },
   {
-    id: "booth-interview",
-    name: "Interview Skills & Mock Sessions",
-    description: "Master the STAR behavioral framework, tackle tough questions, and practice live mock interview scenarios.",
-    location: "Hall A — Booth 2",
-    facilitators: ["Efua Mensah", "David Osei"],
-    boothCode: "IS7284",
+    id: "booth-pharmacovigilance",
+    name: "Pharmacovigilance & Patient Safety",
+    description: "Learn about drug safety monitoring, adverse-event reporting, and the regulatory careers protecting patients worldwide.",
+    location: "Exhibition Hall B",
+    facilitators: ["Michelle Akua Amoatin"],
+    boothCode: "PVS310",
     isActive: true,
-    category: "Job Readiness"
+    category: "Career Track"
   },
   {
-    id: "booth-advancement",
-    name: "Career Advancement & Corporate Ladder",
-    description: "Strategies for negotiating offers, mentorship cultivation, workplace navigation, and rapid career promotion.",
-    location: "Hall B — Booth 3",
-    facilitators: ["Kofi Boateng", "Grace Addo"],
-    boothCode: "CA3910",
+    id: "booth-insurance",
+    name: "Insurance & Payer Services",
+    description: "Discover how pharmacists lead in health insurance, claims management, and payer service operations.",
+    location: "Exhibition Hall C",
+    facilitators: ["Doreen Efua Amoatin"],
+    boothCode: "INS612",
     isActive: true,
-    category: "Growth"
+    category: "Career Track"
   },
   {
-    id: "booth-branding",
-    name: "Personal Branding & LinkedIn Optimization",
-    description: "Transform your LinkedIn profile, build thought leadership, expand network connections, and attract recruiters.",
-    location: "Hall B — Booth 4",
-    facilitators: ["Nana Yeboah", "Abena Sarpong"],
-    boothCode: "PB6145",
+    id: "booth-business-commerce",
+    name: "Business & Commerce",
+    description: "From commercial strategy to business development — explore how pharmacists drive value in the healthcare market.",
+    location: "Exhibition Hall D",
+    facilitators: ["Jonathan Ahumah-Sackey"],
+    boothCode: "BCM748",
     isActive: true,
-    category: "Networking"
+    category: "Career Track"
   },
   {
-    id: "booth-entrepreneurship",
-    name: "Entrepreneurship & Venture Launch",
-    description: "From idea validation to pitch decks, fundraising options, and building sustainable early-stage startups.",
-    location: "Hall C — Booth 5",
-    facilitators: ["Samuel Quaye", "Dr. Linda Kwarteng"],
-    boothCode: "EV9031",
+    id: "booth-supply-chain",
+    name: "Supply Chain Management",
+    description: "Follow the medicine journey — procurement, distribution, cold-chain logistics, and inventory optimisation.",
+    location: "Exhibition Hall E",
+    facilitators: ["Priscilla Mante"],
+    boothCode: "SCM295",
     isActive: true,
-    category: "Business"
+    category: "Career Track"
   },
   {
-    id: "booth-tech",
-    name: "Tech Careers & AI Frontier",
-    description: "Navigating tech roles, building open-source portfolios, and leveraging modern AI tools in your daily workflow.",
-    location: "Hall C — Booth 6",
-    facilitators: ["Emmanuel Darko", "Akosua Mensah"],
-    boothCode: "TC5520",
+    id: "booth-law",
+    name: "Law",
+    description: "The intersection of pharmacy and law — intellectual property, regulation, compliance, and health policy.",
+    location: "Exhibition Hall F",
+    facilitators: ["Bietrix Fredcy Awuah"],
+    boothCode: "LAW861",
     isActive: true,
-    category: "Technology"
+    category: "Career Track"
+  },
+  {
+    id: "booth-media-acting",
+    name: "Media & Acting",
+    description: "Shine on screen and stage — media production, health communication, and acting careers for pharmacists.",
+    location: "Exhibition Hall G",
+    facilitators: ["Pharm Philip Torgboh Mensah"],
+    boothCode: "MDA437",
+    isActive: true,
+    category: "Career Track"
+  },
+  {
+    id: "booth-clinical-trials",
+    name: "Clinical Trials & Research",
+    description: "Designing and running clinical studies — from protocol development to data integrity and ethical oversight.",
+    location: "Exhibition Hall H",
+    facilitators: ["Mark Ekow N.B.E Bismarck"],
+    boothCode: "CTR524",
+    isActive: true,
+    category: "Career Track"
+  },
+  {
+    id: "booth-product-development",
+    name: "Product Development & Management",
+    description: "Bring pharmaceutical and digital health products to life — innovation, portfolio strategy, and product leadership.",
+    location: "Exhibition Hall I",
+    facilitators: ["Joel Anaman"],
+    boothCode: "PDM690",
+    isActive: true,
+    category: "Career Track"
+  },
+  {
+    id: "booth-schools-scholarships",
+    name: "School & Scholarships",
+    description: "Find graduate programmes, funding opportunities, and scholarship pathways to advance your pharmacy education.",
+    location: "Exhibition Hall J",
+    facilitators: ["Nana Ofori Adomako", "Nana Kusi Boadum"],
+    boothCode: "SSS356",
+    isActive: true,
+    category: "Career Track"
+  },
+  {
+    id: "booth-software-engineering",
+    name: "Software Engineering",
+    description: "Build the future of healthcare technology — software development, health informatics, and digital product engineering.",
+    location: "Exhibition Hall K",
+    facilitators: ["Andrews Boateng"],
+    boothCode: "SEG412",
+    isActive: true,
+    category: "Career Track"
+  },
+  {
+    id: "booth-market-intelligence",
+    name: "Market Intelligence",
+    description: "Turn data into decisions — market research, competitive analysis, and insight-driven pharmaceutical strategy.",
+    location: "Exhibition Hall L",
+    facilitators: ["Joseph Nelson Addy"],
+    boothCode: "MKI908",
+    isActive: true,
+    category: "Career Track"
   }
 ];
+
+// Bump this when confirmed event data (booths/facilitators) changes so
+// existing installations pick up the new seed set instead of stale local data.
+const BOOTH_SEED_VERSION = 2;
+export const INITIAL_BOOTH_SEED_VERSION = BOOTH_SEED_VERSION;
 
 // Pre-seeded participants for initial rich M&E analytics baseline
 const SEED_PARTICIPANTS: Participant[] = [
   {
     id: "p-1",
-    code: "KCF-00482",
+    code: "NEXUS-4XK9M2",
     fullName: "Bernice Owusu",
     phone: "+233 24 555 0101",
     email: "bernyx.owusu@gmail.com",
@@ -127,11 +196,32 @@ const SEED_PARTICIPANTS: Participant[] = [
     ageRange: "21-24",
     gender: "Female",
     referralSource: "Social Media / LinkedIn",
-    registeredAt: "2026-08-22T08:15:00Z"
+    registeredAt: "2026-08-08T10:15:00Z",
+    registrationType: "pre_registration",
+    registeredBeforeEvent: true,
+    checkedIn: true,
+    checkedInAt: "2026-08-22T08:30:00Z",
+    eventDate: "2026-08-22",
+    psghRegistrationNumber: "PSGH-20981",
+    yearOfCompletion: "2023",
+    highestEducation: "BPharm",
+    currentJobTitle: "Regulatory Affairs Officer",
+    currentAreaOfPractice: "Regulatory",
+    regionOfResidence: "Greater Accra",
+    idealCareerPath: "Regulatory",
+    careerFairExpectations: [
+      "To gather unbiased information on different career pathways available",
+      "To network with industry professionals"
+    ],
+    careerTracks: ["Pharmacovigilance & Patient Safety", "Business & Commerce"],
+    resumeQuality: 4,
+    interviewConfidence: 3,
+    heardAboutCareerFair: "Through a friend/colleague",
+    attendedLastYear: "Yes"
   },
   {
     id: "p-2",
-    code: "KCF-00109",
+    code: "NEXUS-096FT4",
     fullName: "John Mensah",
     phone: "+233 20 555 0102",
     email: "john.mensah@example.com",
@@ -142,11 +232,25 @@ const SEED_PARTICIPANTS: Participant[] = [
     ageRange: "21-24",
     gender: "Male",
     referralSource: "University Notice Board",
-    registeredAt: "2026-08-22T08:22:00Z"
+    registeredAt: "2026-08-12T13:10:00Z",
+    registrationType: "pre_registration",
+    registeredBeforeEvent: true,
+    checkedIn: true,
+    checkedInAt: "2026-08-22T08:40:00Z",
+    eventDate: "2026-08-22",
+    psghRegistrationNumber: "PSGH-11024",
+    yearOfCompletion: "2024",
+    highestEducation: "PharmD",
+    currentJobTitle: "Pharmacy Intern",
+    currentAreaOfPractice: "Hospitals",
+    regionOfResidence: "Ashanti",
+    idealCareerPath: "Hospital",
+    careerTracks: ["Clinical Trials & Research"],
+    attendedLastYear: "No"
   },
   {
     id: "p-3",
-    code: "KCF-00215",
+    code: "NEXUS-7F42K9",
     fullName: "Ama Boateng",
     phone: "+233 55 555 0103",
     email: "ama.boateng@example.com",
@@ -157,11 +261,34 @@ const SEED_PARTICIPANTS: Participant[] = [
     ageRange: "25-29",
     gender: "Female",
     referralSource: "Friend / Word of Mouth",
-    registeredAt: "2026-08-22T08:30:00Z"
+    registeredAt: "2026-08-02T09:00:00Z",
+    registrationType: "pre_registration",
+    registeredBeforeEvent: true,
+    checkedIn: true,
+    checkedInAt: "2026-08-22T08:45:00Z",
+    eventDate: "2026-08-22",
+    psghRegistrationNumber: "PSGH-33258",
+    yearOfCompletion: "2018",
+    highestEducation: "Master's",
+    currentJobTitle: "Community Pharmacist",
+    currentAreaOfPractice: "Community",
+    regionOfResidence: "Central",
+    idealCareerPath: "Community",
+    careerFairExpectations: ["To secure a new job", "To network with industry professionals"],
+    careerTracks: ["Product Development & Management", "Market Intelligence"],
+    skillsLabResumeAssistance: "Yes",
+    resumeQuality: 3,
+    cvUploaded: true,
+    cvFileName: "ama_boateng_cv.pdf",
+    interviewConfidence: 4,
+    mockInterview: "Yes",
+    heardAboutCareerFair: "Twitter/X",
+    attendedLastYear: "Yes",
+    facilitatorQuestions: "How do I transition from community practice into product management in pharma?"
   },
   {
     id: "p-4",
-    code: "KCF-00340",
+    code: "NEXUS-3PD8V5",
     fullName: "Kwesi Appiah",
     phone: "+233 27 555 0104",
     email: "kwesi.appiah@example.com",
@@ -172,11 +299,25 @@ const SEED_PARTICIPANTS: Participant[] = [
     ageRange: "18-20",
     gender: "Male",
     referralSource: "Email Newsletter",
-    registeredAt: "2026-08-22T08:45:00Z"
+    registeredAt: "2026-08-05T14:30:00Z",
+    registrationType: "pre_registration",
+    registeredBeforeEvent: true,
+    checkedIn: true,
+    checkedInAt: "2026-08-22T09:00:00Z",
+    eventDate: "2026-08-22",
+    psghRegistrationNumber: "0000",
+    yearOfCompletion: "2026",
+    highestEducation: "Student",
+    currentJobTitle: "Student",
+    currentAreaOfPractice: "Community",
+    regionOfResidence: "Eastern",
+    idealCareerPath: "Marketing",
+    careerTracks: ["Software Engineering", "Product Development & Management"],
+    heardAboutCareerFair: "WhatsApp"
   },
   {
     id: "p-5",
-    code: "KCF-00412",
+    code: "NEXUS-6RTQ1C",
     fullName: "Eunice Aryee",
     phone: "+233 24 555 0105",
     email: "eunice.a@example.com",
@@ -187,11 +328,29 @@ const SEED_PARTICIPANTS: Participant[] = [
     ageRange: "21-24",
     gender: "Female",
     referralSource: "Social Media / LinkedIn",
-    registeredAt: "2026-08-22T08:50:00Z"
+    registeredAt: "2026-08-10T11:45:00Z",
+    registrationType: "pre_registration",
+    registeredBeforeEvent: true,
+    checkedIn: true,
+    checkedInAt: "2026-08-22T09:10:00Z",
+    eventDate: "2026-08-22",
+    psghRegistrationNumber: "PSGH-77102",
+    yearOfCompletion: "2023",
+    highestEducation: "BPharm",
+    currentJobTitle: "Medical Sales Representative",
+    currentAreaOfPractice: "Marketing",
+    regionOfResidence: "Greater Accra",
+    idealCareerPath: "Marketing",
+    careerFairExpectations: ["To gather unbiased information on different career pathways available"],
+    careerTracks: ["Insurance & Payer Services", "International Development"],
+    resumeQuality: 4,
+    interviewConfidence: 2,
+    mockInterview: "Yes",
+    heardAboutCareerFair: "PSGH Communications"
   },
   {
     id: "p-6",
-    code: "KCF-00518",
+    code: "NEXUS-2KBW7E",
     fullName: "David Frimpong",
     phone: "+233 50 555 0106",
     email: "david.f@example.com",
@@ -202,7 +361,24 @@ const SEED_PARTICIPANTS: Participant[] = [
     ageRange: "25-29",
     gender: "Male",
     referralSource: "Lecturer / Advisor",
-    registeredAt: "2026-08-22T09:05:00Z"
+    registeredAt: "2026-08-12T16:20:00Z",
+    registrationType: "pre_registration",
+    registeredBeforeEvent: true,
+    checkedIn: false,
+    eventDate: "2026-08-22",
+    psghRegistrationNumber: "PSGH-88503",
+    yearOfCompletion: "2020",
+    highestEducation: "PhD",
+    currentJobTitle: "Research Scientist",
+    currentAreaOfPractice: "Academia & Research",
+    regionOfResidence: "Western",
+    idealCareerPath: "Academia",
+    careerTracks: ["Clinical Trials & Research", "School & Scholarships"],
+    skillsLabResumeAssistance: "Other",
+    skillsLabResumeAssistanceOther: "Cover letter review",
+    resumeQuality: 5,
+    interviewConfidence: 5,
+    attendedLastYear: "Yes"
   }
 ];
 
@@ -219,11 +395,11 @@ const SEED_VISITS: BoothVisit[] = [
     id: "v-1",
     participantId: "p-1",
     participantName: "Bernice Owusu",
-    boothId: "booth-cv",
-    boothName: "CV & Cover Letter Masterclass",
-    facilitator: "Ama Mensah",
-    boothCode: "CV4827",
-    reflection: "Learned how to structure achievements using metrics rather than just duties (e.g. boosted pipeline by 30%).",
+    boothId: "booth-pharmacovigilance",
+    boothName: "Pharmacovigilance & Patient Safety",
+    facilitator: "Michelle Akua Amoatin",
+    boothCode: "PVS310",
+    reflection: "Learned how drug safety data is gathered in real-world settings and what a typical PV associate actually does day to day.",
     timestamp: "2026-08-22T09:30:00Z",
     verificationStatus: "verified"
   },
@@ -231,11 +407,11 @@ const SEED_VISITS: BoothVisit[] = [
     id: "v-2",
     participantId: "p-1",
     participantName: "Bernice Owusu",
-    boothId: "booth-interview",
-    boothName: "Interview Skills & Mock Sessions",
-    facilitator: "Efua Mensah",
-    boothCode: "IS7284",
-    reflection: "Practiced the STAR method for behavioral questions and how to answer 'Tell me about yourself' in under 90s.",
+    boothId: "booth-business-commerce",
+    boothName: "Business & Commerce",
+    facilitator: "Jonathan Ahumah-Sackey",
+    boothCode: "BCM748",
+    reflection: "Practiced positioning my regulatory background for commercial roles and how to answer 'Tell me about yourself' in under 90s.",
     timestamp: "2026-08-22T10:15:00Z",
     verificationStatus: "verified"
   },
@@ -243,11 +419,11 @@ const SEED_VISITS: BoothVisit[] = [
     id: "v-3",
     participantId: "p-3",
     participantName: "Ama Boateng",
-    boothId: "booth-branding",
-    boothName: "Personal Branding & LinkedIn Optimization",
-    facilitator: "Nana Yeboah",
-    boothCode: "PB6145",
-    reflection: "Optimized my LinkedIn headline with target industry keywords and wrote a concise 'About' bio narrative.",
+    boothId: "booth-product-development",
+    boothName: "Product Development & Management",
+    facilitator: "Joel Anaman",
+    boothCode: "PDM690",
+    reflection: "Got a clear picture of the product lifecycle in pharma and wrote a tighter personal positioning statement.",
     timestamp: "2026-08-22T09:45:00Z",
     verificationStatus: "verified"
   },
@@ -255,11 +431,11 @@ const SEED_VISITS: BoothVisit[] = [
     id: "v-4",
     participantId: "p-3",
     participantName: "Ama Boateng",
-    boothId: "booth-cv",
-    boothName: "CV & Cover Letter Masterclass",
-    facilitator: "Ama Mensah",
-    boothCode: "CV4827",
-    reflection: "Removed outdated high school details and focused on portfolio case studies.",
+    boothId: "booth-market-intelligence",
+    boothName: "Market Intelligence",
+    facilitator: "Joseph Nelson Addy",
+    boothCode: "MKI908",
+    reflection: "Learned how competitive analysis and primary research feed product roadmaps.",
     timestamp: "2026-08-22T10:30:00Z",
     verificationStatus: "verified"
   },
@@ -267,11 +443,11 @@ const SEED_VISITS: BoothVisit[] = [
     id: "v-5",
     participantId: "p-3",
     participantName: "Ama Boateng",
-    boothId: "booth-interview",
-    boothName: "Interview Skills & Mock Sessions",
-    facilitator: "David Osei",
-    boothCode: "IS7284",
-    reflection: "Learned effective body language and 3 questions to ask interviewers at the end of every interview.",
+    boothId: "booth-international-development",
+    boothName: "International Development",
+    facilitator: "Aristotle John Nikoi",
+    boothCode: "INT827",
+    reflection: "Explored how health-system and NGO roles can be a bridge from community pharmacy into broader public health impact.",
     timestamp: "2026-08-22T11:15:00Z",
     verificationStatus: "verified"
   },
@@ -279,11 +455,11 @@ const SEED_VISITS: BoothVisit[] = [
     id: "v-6",
     participantId: "p-3",
     participantName: "Ama Boateng",
-    boothId: "booth-advancement",
-    boothName: "Career Advancement & Corporate Ladder",
-    facilitator: "Grace Addo",
-    boothCode: "CA3910",
-    reflection: "Understood the value of finding both an internal mentor and an executive sponsor.",
+    boothId: "booth-insurance",
+    boothName: "Insurance & Payer Services",
+    facilitator: "Doreen Efua Amoatin",
+    boothCode: "INS612",
+    reflection: "Understood how private health insurance and payer structures shape which pharma products reach patients.",
     timestamp: "2026-08-22T12:00:00Z",
     verificationStatus: "verified"
   },
@@ -291,11 +467,11 @@ const SEED_VISITS: BoothVisit[] = [
     id: "v-7",
     participantId: "p-4",
     participantName: "Kwesi Appiah",
-    boothId: "booth-entrepreneurship",
-    boothName: "Entrepreneurship & Venture Launch",
-    facilitator: "Samuel Quaye",
-    boothCode: "EV9031",
-    reflection: "Discovered the customer discovery framework and minimum viable prototype testing.",
+    boothId: "booth-software-engineering",
+    boothName: "Software Engineering",
+    facilitator: "Andrews Boateng",
+    boothCode: "SEG412",
+    reflection: "Discovered the customer discovery framework and how early-stage teams test assumptions before building.",
     timestamp: "2026-08-22T09:50:00Z",
     verificationStatus: "verified"
   },
@@ -303,11 +479,11 @@ const SEED_VISITS: BoothVisit[] = [
     id: "v-8",
     participantId: "p-2",
     participantName: "John Mensah",
-    boothId: "booth-tech",
-    boothName: "Tech Careers & AI Frontier",
-    facilitator: "Emmanuel Darko",
-    boothCode: "TC5520",
-    reflection: "Learned about AI coding tools, open source contributions, and modern developer portfolio expectations.",
+    boothId: "booth-clinical-trials",
+    boothName: "Clinical Trials & Research",
+    facilitator: "Mark Ekow N.B.E Bismarck",
+    boothCode: "CTR524",
+    reflection: "Got practical guidance on ICH-GCP, real-world evidence work, and positioning a hospital pharmacy background for research roles.",
     timestamp: "2026-08-22T10:00:00Z",
     verificationStatus: "verified"
   }
@@ -320,9 +496,9 @@ const SEED_SURVEYS: ExitSurvey[] = [
     participantName: "Ama Boateng",
     overallRating: 5,
     confidenceRating: 5,
-    mostUsefulBoothId: "booth-interview",
-    mostUsefulBoothName: "Interview Skills & Mock Sessions",
-    keyLearning: "Using the STAR method completely transformed my confidence during mock interviews.",
+    mostUsefulBoothId: "booth-product-development",
+    mostUsefulBoothName: "Product Development & Management",
+    keyLearning: "Understanding how user research feeds product roadmaps gave me a clear path from community pharmacy into pharma product management.",
     improvement: "Provide more power banks or charging stations in the main exhibition hall.",
     submittedAt: "2026-08-22T12:45:00Z"
   }
@@ -354,16 +530,40 @@ export class StorageService {
       return SEED_PARTICIPANTS;
     }
     try {
-      return JSON.parse(raw);
+      const parsed = JSON.parse(raw) as Participant[];
+      return parsed.map(p => this.normalizeParticipant(p));
     } catch {
       return SEED_PARTICIPANTS;
     }
   }
 
+  static saveParticipants(participants: Participant[]): void {
+    localStorage.setItem(STORAGE_KEYS.PARTICIPANTS, JSON.stringify(participants));
+  }
+
+  // Backfills new-model fields on any legacy / externally-created participant record
+  static normalizeParticipant(p: Participant): Participant {
+    const legacy = p.registrationType === undefined;
+    const attendance = this.getAttendance();
+    const att = attendance.find(a => a.participantId === p.id && a.status === "Checked In");
+    const preRegistered = p.registrationType === 'pre_registration' || (legacy && !!p.code && !p.code.startsWith(CODE_PREFIX));
+    return {
+      ...p,
+      fullName: p.fullName.trim(),
+      registrationType: p.registrationType || 'pre_registration',
+      registeredBeforeEvent: p.registeredBeforeEvent ?? true,
+      checkedIn: p.checkedIn || !!att,
+      checkedInAt: p.checkedInAt || att?.checkInTime,
+      eventDate: p.eventDate || this.getConfig().eventDate
+    };
+  }
+
   static getBooths(): Booth[] {
     const raw = localStorage.getItem(STORAGE_KEYS.BOOTHS);
-    if (!raw) {
+    const seededVersion = localStorage.getItem(STORAGE_KEYS.BOOTH_SEED_VERSION);
+    if (!raw || seededVersion !== String(BOOTH_SEED_VERSION)) {
       localStorage.setItem(STORAGE_KEYS.BOOTHS, JSON.stringify(INITIAL_BOOTHS));
+      localStorage.setItem(STORAGE_KEYS.BOOTH_SEED_VERSION, String(BOOTH_SEED_VERSION));
       return INITIAL_BOOTHS;
     }
     try {
@@ -449,24 +649,92 @@ export class StorageService {
   }
 
   // Registration
-  static registerParticipant(data: Omit<Participant, 'id' | 'code' | 'registeredAt'>): Participant {
-    const participants = this.getParticipants();
+  private static newParticipantId(): string {
+    return `p-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
+  }
 
-    // Generate unique code format KCF-XXXXX
-    const num = Math.floor(10000 + Math.random() * 90000);
-    const code = `KCF-${num}`;
-    const id = `p-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
+  // Sanitizes free-text inputs before persistence
+  private static sanitize(data: Record<string, unknown>): void {
+    if (typeof data.fullName === 'string') data.fullName = data.fullName.trim();
+    if (typeof data.email === 'string') data.email = data.email.trim().toLowerCase();
+    if (typeof data.phone === 'string') data.phone = data.phone.trim();
+    if (typeof data.psghRegistrationNumber === 'string') {
+      data.psghRegistrationNumber = data.psghRegistrationNumber.trim();
+    }
+  }
+
+  // Generates a unique NEXUS-XXXXXX registration code (no ambiguous O/0, I/1, S/5)
+  static generateRegistrationCode(): string {
+    const existingCodes = new Set(this.getParticipants().map(p => p.code));
+    let code = '';
+    do {
+      let suffix = '';
+      for (let i = 0; i < CODE_DIGITS; i++) {
+        suffix += CODE_ALPHABET[Math.floor(Math.random() * CODE_ALPHABET.length)];
+      }
+      code = `${CODE_PREFIX}${suffix}`;
+    } while (existingCodes.has(code));
+    return code;
+  }
+
+  // Case-insensitive lookup by registration code (accepts with/without NEXUS- prefix)
+  static findParticipantByCode(code: string): Participant | null {
+    const normalized = code.trim().toUpperCase().replace(/\s+/g, '');
+    const bare = normalized.replace(new RegExp(`^${CODE_PREFIX}`), '');
+    const participants = this.getParticipants();
+    return participants.find(p => {
+      const pBare = p.code.replace(new RegExp(`^${CODE_PREFIX}`), '');
+      return p.code === normalized || p.code === bare || pBare === bare;
+    }) || null;
+  }
+
+  // Full pre-registration questionnaire -> registered but NOT yet checked in
+  static registerPreRegistration(data: PreRegistrationData): Participant {
+    const sanitized: Record<string, unknown> = { ...data };
+    this.sanitize(sanitized);
+
+    const raw: PreRegistrationData = sanitized as unknown as PreRegistrationData;
 
     const newParticipant: Participant = {
-      ...data,
-      id,
-      code,
-      registeredAt: new Date().toISOString()
+      ...raw,
+      id: this.newParticipantId(),
+      code: this.generateRegistrationCode(),
+      registeredAt: new Date().toISOString(),
+      registrationType: 'pre_registration',
+      registeredBeforeEvent: true,
+      checkedIn: false
     };
 
-    const updated = [newParticipant, ...participants];
-    localStorage.setItem(STORAGE_KEYS.PARTICIPANTS, JSON.stringify(updated));
-    this.setCurrentParticipantId(id);
+    this.saveParticipants([newParticipant, ...this.getParticipants()]);
+    this.setCurrentParticipantId(newParticipant.id);
+
+    return newParticipant;
+  }
+
+  // Short event-day registration (Name, Email, Phone, Registration Number) -> checked in immediately
+  static registerWalkIn(data: WalkInRegistrationData): Participant {
+    const sanitized: Record<string, unknown> = { ...data };
+    this.sanitize(sanitized);
+
+    const raw: WalkInRegistrationData = sanitized as unknown as WalkInRegistrationData;
+
+    const newParticipant: Participant = {
+      ...raw,
+      id: this.newParticipantId(),
+      code: this.generateRegistrationCode(),
+      registeredAt: new Date().toISOString(),
+      registrationType: 'walk_in',
+      registeredBeforeEvent: false,
+      checkedIn: true,
+      checkedInAt: new Date().toISOString(),
+      eventDate: this.getConfig().eventDate
+    };
+
+    this.saveParticipants([newParticipant, ...this.getParticipants()]);
+    this.setCurrentParticipantId(newParticipant.id);
+
+    // Log attendance as well so the attendance sheet stays consistent
+    this.checkInParticipant(newParticipant.id);
 
     return newParticipant;
   }
@@ -480,27 +748,38 @@ export class StorageService {
     }
 
     const attendance = this.getAttendance();
-    const existing = attendance.find(a => a.participantId === participantId);
+    const existing = attendance.find(a => a.participantId === participantId && a.status === "Checked In");
     if (existing) {
+      // Ensure participant record reflects the external check-in state
+      if (!participant.checkedIn) {
+        this.saveParticipants(participants.map(p => p.id === participantId
+          ? { ...p, checkedIn: true, checkedInAt: existing.checkInTime, eventDate: this.getConfig().eventDate }
+          : p));
+      }
       return existing;
     }
 
     const config = this.getConfig();
+    const checkInTime = new Date().toISOString();
     const record: AttendanceRecord = {
       id: `att-${Date.now()}`,
       participantId,
       participantName: participant.fullName,
       eventName: config.eventName,
-      checkInTime: new Date().toISOString(),
+      checkInTime,
       status: "Checked In"
     };
 
-    const updated = [record, ...attendance];
-    localStorage.setItem(STORAGE_KEYS.ATTENDANCE, JSON.stringify(updated));
+    this.saveParticipants(participants.map(p => p.id === participantId
+      ? { ...p, checkedIn: true, checkedInAt: checkInTime, eventDate: config.eventDate }
+      : p));
+    localStorage.setItem(STORAGE_KEYS.ATTENDANCE, JSON.stringify([record, ...attendance]));
     return record;
   }
 
   static isParticipantCheckedIn(participantId: string): boolean {
+    const participant = this.getParticipants().find(p => p.id === participantId);
+    if (participant?.checkedIn) return true;
     const attendance = this.getAttendance();
     return attendance.some(a => a.participantId === participantId && a.status === "Checked In");
   }
@@ -632,6 +911,15 @@ export class StorageService {
 
     const totalRegistered = participants.length;
 
+    // Registration funnel metrics
+    const preRegistered = participants.filter(p => p.registrationType === 'pre_registration');
+    const walkedIn = participants.filter(p => p.registrationType === 'walk_in');
+    const checkedInCount = participants.filter(p => p.checkedIn).length;
+    const preRegisteredCheckedIn = preRegistered.filter(p => p.checkedIn).length;
+    const preRegistrationAttendanceRate = preRegistered.length > 0
+      ? (preRegisteredCheckedIn / preRegistered.length) * 100
+      : 0;
+
     // Count unique checked-in participants
     const checkedInParticipantIds = new Set(
       attendance.filter(a => a.status === 'Checked In').map(a => a.participantId)
@@ -671,7 +959,12 @@ export class StorageService {
       completedMinBoothsCount,
       completionRate: Math.round(completionRate * 10) / 10,
       exitSurveysCount,
-      avgBoothsPerAttendee: Math.round(avgBoothsPerAttendee * 100) / 100
+      avgBoothsPerAttendee: Math.round(avgBoothsPerAttendee * 100) / 100,
+      preRegisteredCount: preRegistered.length,
+      walkedInCount: walkedIn.length,
+      checkedInCount,
+      preRegisteredCheckedIn,
+      preRegistrationAttendanceRate: Math.round(preRegistrationAttendanceRate * 10) / 10
     };
   }
 
