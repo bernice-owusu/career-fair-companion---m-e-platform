@@ -6,6 +6,7 @@ import { RegistrationService } from '../../services/registrationService';
 
 interface CodeCheckInScreenProps {
   config: EventConfig;
+  eventId: string;
   initialParticipant?: Participant | null;
   onSuccess: (participant: Participant) => void;
   onBack: () => void;
@@ -16,6 +17,7 @@ type Phase = 'entry' | 'verifying' | 'confirm' | 'checking_in' | 'success';
 
 export const CodeCheckInScreen: React.FC<CodeCheckInScreenProps> = ({
   config,
+  eventId,
   initialParticipant,
   onSuccess,
   onBack,
@@ -36,7 +38,7 @@ export const CodeCheckInScreen: React.FC<CodeCheckInScreenProps> = ({
   const handleVerify = () => {
     setError('');
     setPhase('verifying');
-    const result = RegistrationService.verifyRegistrationCode(code);
+    const result = RegistrationService.verifyRegistrationCode(code, eventId);
     // Small pause so the "Verifying..." state is visible; verification is real.
     setTimeout(() => {
       if (!result.valid || !result.participant) {

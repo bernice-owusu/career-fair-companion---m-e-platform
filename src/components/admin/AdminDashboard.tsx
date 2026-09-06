@@ -11,15 +11,17 @@ import { Participant, AttendanceRecord, Booth, BoothVisit, ExitSurvey, EventConf
 import { StorageService } from '../../services/storageService';
 import { RegistrationService } from '../../services/registrationService';
 import { GoogleSheetsService } from '../../services/googleSheetsService';
+import { QuestionsAdmin } from './QuestionsAdmin';
 import { RESUME_QUALITY_LABELS, INTERVIEW_CONFIDENCE_LABELS } from '../../registrationOptions';
 
 interface AdminDashboardProps {
   config: EventConfig;
+  eventId?: string;
   onUpdateConfig: (newConfig: EventConfig) => void;
   onExitAdmin: () => void;
 }
 
-type AdminTab = 'overview' | 'participants' | 'booths' | 'surveys' | 'sheets' | 'settings';
+type AdminTab = 'overview' | 'participants' | 'booths' | 'surveys' | 'questions' | 'sheets' | 'settings';
 
 interface ConfirmDialogState {
   isOpen: boolean;
@@ -32,16 +34,17 @@ interface ConfirmDialogState {
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   config,
+  eventId,
   onUpdateConfig,
   onExitAdmin,
 }) => {
   const [activeTab, setActiveTab] = useState<AdminTab>('overview');
-  const [participants, setParticipants] = useState<Participant[]>(StorageService.getParticipants());
-  const [attendance, setAttendance] = useState<AttendanceRecord[]>(StorageService.getAttendance());
+  const [participants, setParticipants] = useState<Participant[]>(StorageService.getParticipants(eventId));
+  const [attendance, setAttendance] = useState<AttendanceRecord[]>(StorageService.getAttendance(eventId));
   const [booths, setBooths] = useState<Booth[]>(StorageService.getBooths());
-  const [visits, setBoothVisits] = useState<BoothVisit[]>(StorageService.getBoothVisits());
-  const [surveys, setSurveys] = useState<ExitSurvey[]>(StorageService.getSurveys());
-  const [metrics, setMetrics] = useState<MneMetrics>(StorageService.getMetrics());
+  const [visits, setBoothVisits] = useState<BoothVisit[]>(StorageService.getBoothVisits(eventId));
+  const [surveys, setSurveys] = useState<ExitSurvey[]>(StorageService.getSurveys(eventId));
+  const [metrics, setMetrics] = useState<MneMetrics>(StorageService.getMetrics(eventId));
 
   // Local Event Configuration Form State
   const [settingsForm, setSettingsForm] = useState<EventConfig>(config);
@@ -49,9 +52,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [newInstitutionInput, setNewInstitutionInput] = useState('');
   const [newInterestInput, setNewInterestInput] = useState('');
 
-  // Keep form synced if parent config prop updates
+  // Keep form synced if parent config prop updates (compare by value so an
+  // identity-only change from the parent doesn't wipe in-progress edits).
   useEffect(() => {
-    setSettingsForm(config);
+    setSettingsForm(prev =>
+      prev && Object.keys(prev).length > 0 && JSON.stringify(prev) === JSON.stringify(config)
+        ? prev
+        : config
+    );
   }, [config]);
 
   // Confirmation Modal state (replaces native window.confirm)
@@ -94,12 +102,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   // Refresh latest data helper
   const reloadData = () => {
-    setParticipants(StorageService.getParticipants());
-    setAttendance(StorageService.getAttendance());
+    setParticipants(StorageService.getParticipants(eventId));
+    setAttendance(StorageService.getAttendance(eventId));
     setBooths(StorageService.getBooths());
-    setBoothVisits(StorageService.getBoothVisits());
-    setSurveys(StorageService.getSurveys());
-    setMetrics(StorageService.getMetrics());
+    setBoothVisits(StorageService.getBoothVisits(eventId));
+    setSurveys(StorageService.getSurveys(eventId));
+    setMetrics(StorageService.getMetrics(eventId));
   };
 
   // Checked in participants lookup set
@@ -385,6 +393,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           { id: 'participants', label: `Participants (${participants.length})`, icon: Users },
           { id: 'booths', label: `Booths (${booths.length})`, icon: Compass },
           { id: 'surveys', label: `Surveys (${surveys.length})`, icon: Star },
+          { id: 'questions', label: 'Questions', icon: MessageSquare },
           { id: 'sheets', label: 'Google Sheets Integration', icon: FileSpreadsheet },
           { id: 'settings', label: 'Event Settings', icon: Settings },
         ].map((tab) => {
@@ -1475,6 +1484,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       )}
 
       {/* TAB 5: GOOGLE SHEETS INTEGRATION & CODE GENERATOR */}
+      {activeTab === 'questions' && (
+        <QuestionsAdmin eventId={eventId || 'friday-professionals-2026'} />
+      )}
+
       {activeTab === 'sheets' && (
         <div className="space-y-6">
           {/* Header Card */}
@@ -1538,13 +1551,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <input
                 type="url"
                 placeholder="https://script.google.com/macros/s/AKfycb.../exec"
-                value={config.appsScriptWebhookUrl || ''}
-                onChange={(e) => onUpdateConfig({ ...config, appsScriptWebhookUrl: e.target.value })}
+                value={settingsForm.appsScriptWebhookUrl || ''}
+                onChange={(e) =>
+                  setSettingsForm(prev => ({ ...prev, appsScriptWebhookUrl: e.target.value }))
+                }
                 className="flex-1 px-3.5 py-2.5 bg-navy/70 border border-mist/25 rounded-xl text-xs text-white font-mono placeholder-mist/30 focus:outline-none focus:border-orange"
               />
               <button
                 onClick={() => {
-                  StorageService.saveConfig(config);
+                  onUpdateConfig({ ...settingsForm });
+                  StorageService.saveConfig(settingsForm);
                   setSyncStatusMsg({ type: 'success', text: 'Webhook URL saved successfully!' });
                 }}
                 className="px-4 py-2 bg-orange hover:bg-orange/90 text-white text-xs font-bold rounded-xl transition"
@@ -2041,27 +2057,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </p>
 
             <div className="flex flex-wrap gap-3 pt-1">
-              <button
-                onClick={() => {
-                  setConfirmDialog({
-                    isOpen: true,
-                    title: 'Load Demo Cohort Data',
-                    message: 'This will populate sample participants, attendance records, and reflections to test analytics. Existing live data will be replaced.',
-                    confirmLabel: 'Load Demo Cohort',
-                    isDestructive: false,
-                    onConfirm: () => {
-                      StorageService.resetToDemoData();
-                      reloadData();
-                      setConfirmDialog(prev => ({ ...prev, isOpen: false }));
-                      setSettingsSavedMsg({ type: 'success', text: 'Demo cohort data loaded successfully.' });
-                    }
-                  });
-                }}
-                className="px-4 py-2.5 rounded-xl bg-navy/70 hover:bg-navy/60 text-mist text-xs font-bold border border-mist/25 transition"
-              >
-                Load Demo Sample Cohort
-              </button>
-
               <button
                 onClick={() => {
                   setConfirmDialog({

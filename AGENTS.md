@@ -4,7 +4,7 @@
 
 Single-package React + Vite + TypeScript mobile-first PWA for career fair registration, booth tracking, reflections, exit surveys, and M&E analytics synced to Google Sheets via Apps Script.
 
-Originally generated from Google AI Studio (see `metadata.json`, `firebase-applet-config.json`).
+Scaffolded from Google AI Studio, then heavily customized; legacy AI Studio artifacts (metadata.json, firebase-applet-config.json, assets/.aistudio) were removed.
 
 ## Commands
 
@@ -36,9 +36,7 @@ There is no test framework, formatter, or CI pipeline configured.
 
 - Path alias `@/` maps to the project root (configured in both `tsconfig.json` and `vite.config.ts`)
 - Tailwind CSS v4 via `@tailwindcss/vite` plugin (not PostCSS) — uses `@import "tailwindcss"` in CSS, not the old `@tailwind` directives
-- `GEMINI_API_KEY` and `APP_URL` env vars come from AI Studio at runtime; `.env.example` is the reference
-- HMR can be disabled via `DISABLE_HMR=true` env var (AI Studio uses this to prevent flickering during agent edits)
-- `firebase-applet-config.json` contains API keys that are AI Studio-managed, not secrets to protect
+- No runtime env vars are required. Optional `DISABLE_HMR=true` (via `.env.local`) makes the dev server skip HMR/file watching; `.env.example` is the reference
 - Default admin passcode is `mne2026` (defined in `DEFAULT_CONFIG` in `storageService.ts`)
 
 ## Gotchas
@@ -46,5 +44,4 @@ There is no test framework, formatter, or CI pipeline configured.
 - Two lockfiles exist (`package-lock.json` and `bun.lock`) — the project was likely set up with npm; prefer npm commands
 - The `clean` script uses `rm -rf` which won't work on native Windows cmd (works in PowerShell/git-bash)
 - Google Sheets sync uses `no-cors` fetch mode — errors are silently swallowed and items are queued in localStorage (`CF_SYNC_QUEUE`) for retry
-- `EntranceQRPresenter` component is imported but commented out in `App.tsx`
-- No `.env.local` file is checked in (`.gitignore` excludes `.env*` except `.env.example`) — create it manually with your `GEMINI_API_KEY` if needed locally
+- No `.env.local` file is checked in (`.gitignore` excludes `.env*` except `.env.example`) — only `DISABLE_HMR` is supported and none are required

@@ -146,8 +146,8 @@ export const ParticipantDashboard: React.FC<ParticipantDashboardProps> = ({
         </div>
       </div>
 
-      {/* Exit Survey Callout if Ready */}
-      {isRequirementMet && !hasCompletedSurvey && (
+      {/* Exit Survey Callout if not yet submitted */}
+      {!hasCompletedSurvey && (
         <div className="bg-gradient-to-r from-orange/15 via-navy to-navy border border-orange/30 rounded-2xl p-4 sm:p-5 flex items-center justify-between gap-3 shadow-lg">
           <div className="space-y-1 min-w-0">
             <h3 className="text-sm font-bold text-orange flex items-center gap-1.5">

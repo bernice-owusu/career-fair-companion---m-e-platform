@@ -35,7 +35,8 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
           <span>Your Career Fair Progress</span>
         </h1>
         <p className="text-xs sm:text-sm text-mist/60 mt-1">
-          Complete at least {minRequired} booths to qualify for event completion.
+          Visit at least {minRequired} booths to reach full event completion.
+          The exit survey is available anytime.
         </p>
       </div>
 
@@ -78,10 +79,10 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
           })}
         </div>
 
-        {isCompleted && !hasCompletedSurvey && (
+        {!hasCompletedSurvey && (
           <div className="pt-2 border-t border-teal/40 flex items-center justify-between gap-3">
             <span className="text-xs text-mist">
-              You're eligible for the exit survey!
+              Share your feedback on the exit survey!
             </span>
             <button
               onClick={onOpenSurvey}

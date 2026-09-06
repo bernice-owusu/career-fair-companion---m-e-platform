@@ -1,0 +1,410 @@
+import React, { useRef, useState } from 'react';
+import { X, Star, CheckCircle2, ArrowRight, ArrowLeft, Send, Pencil } from 'lucide-react';
+import { Participant, PostEventSurvey } from '../../types';
+import { StorageService } from '../../services/storageService';
+
+interface MondaySurveyModalProps {
+  participant: Participant;
+  onClose: () => void;
+  onSuccess: (survey: PostEventSurvey) => void;
+}
+
+const QUESTION_COUNT = 7;
+const STEP_QUESTION_IDS = ['sessionValue', 'organisation', 'networkingUseful', 'connectWithCompanies', 'returnLikelihood', 'themes', 'improvements'] as const;
+const STEP_TITLES = [
+  'Today\u2019s session',
+  'Event organisation',
+  'Networking useful?',
+  'Connect with companies?',
+  'Attend again?',
+  'Future themes',
+  'Improvements',
+];
+
+const StarRating: React.FC<{
+  value: number;
+  onChange: (n: number) => void;
+  startLabel: string;
+  endLabel: string;
+}> = ({ value, onChange, startLabel, endLabel }) => (
+  <div>
+    <div className="grid grid-cols-5 gap-2 pt-1">
+      {[1, 2, 3, 4, 5].map(n => (
+        <button
+          type="button"
+          key={n}
+          onClick={() => onChange(n)}
+          aria-pressed={value === n}
+          aria-label={`${n} star${n > 1 ? 's' : ''}`}
+          className={`flex-1 min-h-14 rounded-xl flex flex-col items-center justify-center gap-1 border transition active:scale-95 ${
+            value >= n
+              ? 'bg-orange/20 border-orange text-orange'
+              : 'bg-navy border-mist/15 text-mist/40 hover:border-mist/30'
+          }`}
+        >
+          <Star className={`w-5 h-5 ${value >= n ? 'fill-orange text-orange' : ''}`} />
+          <span className="text-[10px] font-bold">{n}</span>
+        </button>
+      ))}
+    </div>
+    <div className="flex justify-between text-[10px] text-mist/40 px-1 mt-1.5">
+      <span>{startLabel}</span>
+      <span>{endLabel}</span>
+    </div>
+  </div>
+);
+
+const ChoiceButtons: React.FC<{
+  value: string;
+  onChange: (o: string) => void;
+  options: string[];
+}> = ({ value, onChange, options }) => (
+  <div className="grid gap-2 pt-1">
+    {options.map(o => (
+      <button
+        type="button"
+        key={o}
+        onClick={() => onChange(o)}
+        aria-pressed={value === o}
+        className={`w-full min-h-12 px-4 py-2.5 rounded-xl text-sm font-bold border transition active:scale-95 ${
+          value === o
+            ? 'bg-orange/20 border-orange text-orange'
+            : 'bg-navy border-mist/15 text-mist/70 hover:border-mist/30'
+        }`}
+      >
+        {o}
+      </button>
+    ))}
+  </div>
+);
+
+const TextQuestion: React.FC<{
+  value: string;
+  onChange: (v: string) => void;
+  placeholder: string;
+}> = ({ value, onChange, placeholder }) => (
+  <textarea
+    rows={4}
+    placeholder={placeholder}
+    value={value}
+    onChange={e => onChange(e.target.value)}
+    className="w-full px-3.5 py-2.5 bg-navy border border-mist/25 rounded-xl text-sm text-white placeholder-mist/40 focus:outline-none focus:border-orange resize-none transition min-h-24"
+  />
+);
+
+export const MondaySurveyModal: React.FC<MondaySurveyModalProps> = ({ participant, onClose, onSuccess }) => {
+  const [step, setStep] = useState(0);
+  const [sessionValue, setSessionValue] = useState(5);
+  const [organisation, setOrganisation] = useState(5);
+  const [networkingUseful, setNetworkingUseful] = useState('');
+  const [connectWithCompanies, setConnectWithCompanies] = useState('');
+  const [returnLikelihood, setReturnLikelihood] = useState(5);
+  const [themes, setThemes] = useState('');
+  const [improvements, setImprovements] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [savedSurvey, setSavedSurvey] = useState<PostEventSurvey | null>(null);
+
+  const isReviewStep = step === QUESTION_COUNT;
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const [isMoving, setIsMoving] = useState(false);
+  const advanceTimer = useRef<number | undefined>(undefined);
+
+  const scrollTop = () => bodyRef.current?.scrollTo({ top: 0 });
+
+  const goNext = () => {
+    if (isMoving || isReviewStep) return;
+    setIsMoving(true);
+    window.clearTimeout(advanceTimer.current);
+    setStep(s => Math.min(s + 1, QUESTION_COUNT));
+    scrollTop();
+    window.setTimeout(() => setIsMoving(false), 300);
+  };
+
+  const goBack = () => {
+    window.clearTimeout(advanceTimer.current);
+    setIsMoving(false);
+    setStep(s => Math.max(s - 1, 0));
+    scrollTop();
+  };
+
+  const selectAndAdvance = (apply: () => void) => {
+    apply();
+    setIsMoving(true);
+    window.clearTimeout(advanceTimer.current);
+    advanceTimer.current = window.setTimeout(() => goNext(), 280);
+  };
+
+  const handleSubmit = () => {
+    setIsSubmitting(true);
+    const survey = StorageService.submitMondaySurvey({
+      participantId: participant.id,
+      responses: {
+        sessionValue,
+        eventOrganisation: organisation,
+        networkingUseful,
+        connectWithCompanies,
+        returnLikelihood,
+        suggestedThemes: themes.trim(),
+        improvements: improvements.trim(),
+      },
+    });
+    setSavedSurvey(survey);
+    setIsSubmitting(false);
+    setSubmitted(true);
+  };
+
+  const progress = Math.round(((step) / QUESTION_COUNT) * 100);
+
+  const reviewItems: { label: string; value: string }[] = [
+    { label: STEP_TITLES[0], value: `${sessionValue} / 5` },
+    { label: STEP_TITLES[1], value: `${organisation} / 5` },
+    { label: STEP_TITLES[2], value: networkingUseful || 'Not answered' },
+    { label: STEP_TITLES[3], value: connectWithCompanies || 'Not answered' },
+    { label: STEP_TITLES[4], value: `${returnLikelihood} / 5` },
+    { label: STEP_TITLES[5], value: themes.trim() || '—' },
+    { label: STEP_TITLES[6], value: improvements.trim() || '—' },
+  ];
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-navy/80 backdrop-blur-sm animate-fadeIn">
+      <div className="bg-navy border border-mist/15 rounded-3xl w-full max-w-xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh]">
+        {/* Header */}
+        <div className="p-4 sm:p-5 border-b border-mist/15 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-9 h-9 rounded-xl bg-orange/20 text-orange flex items-center justify-center shrink-0">
+              <Star className="w-4 h-4 fill-orange" />
+            </div>
+            <div className="min-w-0">
+              <h2 className="text-sm sm:text-base font-bold text-white truncate">
+                Students' Fair — Post-Event Survey
+              </h2>
+              <p className="text-[11px] text-mist/60">
+                Help the M&E team evaluate today's impact
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 rounded-lg text-mist/60 hover:text-white hover:bg-navy/60 transition shrink-0"
+            aria-label="Close survey"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div ref={bodyRef} className="p-4 sm:p-5 overflow-y-auto space-y-4 flex-1">
+          {submitted ? (
+            <div className="text-center py-8 space-y-4 animate-fadeIn">
+              <div className="w-16 h-16 rounded-full bg-teal/20 border-2 border-teal/50 flex items-center justify-center text-mist mx-auto">
+                <CheckCircle2 className="w-8 h-8" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-xl font-bold text-white">Thank You for Your Feedback!</h3>
+                <p className="text-xs text-mist/80 max-w-sm mx-auto">
+                  Your responses have been recorded in the central M&E dataset.
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  if (savedSurvey) onSuccess(savedSurvey);
+                  onClose();
+                }}
+                className="w-full py-3.5 px-4 rounded-xl bg-teal hover:bg-teal/90 text-white font-bold text-sm shadow-lg shadow-teal/30 transition active:scale-[0.98]"
+              >
+                Back to Dashboard
+              </button>
+            </div>
+          ) : (
+            <>
+              {/* Progress */}
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-orange">
+                    {isReviewStep ? 'Review & Submit' : `Question ${step + 1} of ${QUESTION_COUNT}`}
+                  </span>
+                  <span className="text-[11px] text-mist/60 font-mono">{progress}%</span>
+                </div>
+                <div className="h-1.5 rounded-full bg-navy overflow-hidden">
+                  <div
+                    className="h-full bg-orange rounded-full transition-all duration-300"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+                <div className="flex gap-1.5 mt-2.5">
+                  {Array.from({ length: QUESTION_COUNT }).map((_, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      disabled={i >= step}
+                      onClick={() => { window.clearTimeout(advanceTimer.current); setStep(i); }}
+                      aria-label={`Go to question ${i + 1}`}
+                      className={`h-1.5 flex-1 rounded-full transition ${
+                        i < step
+                          ? 'bg-orange/60 hover:bg-orange'
+                          : i === step
+                            ? 'bg-orange'
+                            : 'bg-mist/15'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Question / Review */}
+              {!isReviewStep ? (
+                <div key={step} className="bg-navy/70 border border-mist/15 rounded-2xl p-4 space-y-2 animate-fadeIn">
+                  <label className="block text-sm font-bold text-white">
+                    {step + 1}. {STEP_TITLES[step]}
+                    {step < 5 && <span className="text-rose-400"> *</span>}
+                  </label>
+                  <p className="text-[11px] text-mist/50 -mt-1">
+                    {step === 0 && 'Rate today\u2019s session overall.'}
+                    {step === 1 && 'How well organised did the event feel?'}
+                    {step === 2 && 'Did you find the networking opportunities useful?'}
+                    {step === 3 && 'Would you connect with the companies/organisations present after today?'}
+                    {step === 4 && 'How likely are you to attend the career fair again in the future?'}
+                    {step === 5 && 'What themes would you like to see at future career fairs?'}
+                    {step === 6 && 'What improvements would you recommend for future events?'}
+                  </p>
+
+                  {step === 0 && (
+                    <StarRating
+                      value={sessionValue}
+                      onChange={n => selectAndAdvance(() => setSessionValue(n))}
+                      startLabel="1 - Poor"
+                      endLabel="5 - Excellent"
+                    />
+                  )}
+                  {step === 1 && (
+                    <StarRating
+                      value={organisation}
+                      onChange={n => selectAndAdvance(() => setOrganisation(n))}
+                      startLabel="1 - Disorganised"
+                      endLabel="5 - Very Organised"
+                    />
+                  )}
+                  {step === 2 && (
+                    <ChoiceButtons
+                      value={networkingUseful}
+                      onChange={o => selectAndAdvance(() => setNetworkingUseful(o))}
+                      options={['Yes', 'No']}
+                    />
+                  )}
+                  {step === 3 && (
+                    <ChoiceButtons
+                      value={connectWithCompanies}
+                      onChange={o => selectAndAdvance(() => setConnectWithCompanies(o))}
+                      options={['Yes', 'No', 'Partially']}
+                    />
+                  )}
+                  {step === 4 && (
+                    <StarRating
+                      value={returnLikelihood}
+                      onChange={n => selectAndAdvance(() => setReturnLikelihood(n))}
+                      startLabel="1 - Unlikely"
+                      endLabel="5 - Very Likely"
+                    />
+                  )}
+                  {step === 5 && (
+                    <TextQuestion
+                      value={themes}
+                      onChange={setThemes}
+                      placeholder="e.g. More hands-on skills workshops, internships spotlights..."
+                    />
+                  )}
+                  {step === 6 && (
+                    <TextQuestion
+                      value={improvements}
+                      onChange={setImprovements}
+                      placeholder="e.g. Longer breaks between talks..."
+                    />
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-3 animate-fadeIn">
+                  <div className="bg-navy/70 border border-mist/15 rounded-2xl p-4">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-orange mb-3">
+                      Review your answers
+                    </h3>
+                    <div className="space-y-2.5">
+                      {reviewItems.map((item, i) => (
+                        <div
+                          key={i}
+                          className="flex items-start justify-between gap-3 border-b border-mist/10 last:border-0 pb-2.5 last:pb-0"
+                        >
+                          <div className="min-w-0">
+                            <p className="text-[11px] text-mist/60">{i + 1}. {item.label}</p>
+                            <p className="text-sm font-semibold text-white">{item.value}</p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => { setStep(i); scrollTop(); }}
+                            className="p-1.5 rounded-lg text-mist/50 hover:text-white hover:bg-navy/60 transition shrink-0"
+                            aria-label={`Edit answer for question ${i + 1}`}
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-mist/50 text-center">
+                    You can go back to edit any answer before submitting.
+                  </p>
+                </div>
+              )}
+
+              {/* Nav */}
+              <div className="flex items-center gap-2.5 pt-1">
+                {step > 0 && (
+                  <button
+                    type="button"
+                    onClick={goBack}
+                    className="px-4 min-h-13 py-3 rounded-xl bg-navy/70 hover:bg-navy/60 text-mist/80 text-sm font-bold border border-mist/20 transition flex items-center gap-1.5 active:scale-[0.98]"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    Back
+                  </button>
+                )}
+                {step < QUESTION_COUNT ? (
+                  <button
+                    type="button"
+                    onClick={goNext}
+                    disabled={isMoving}
+                    className="flex-1 min-h-13 py-3 px-4 rounded-xl bg-orange hover:bg-orange/90 text-white text-sm font-bold shadow-lg shadow-orange/25 transition active:scale-[0.98] disabled:opacity-60"
+                  >
+                    <span className="flex items-center justify-center gap-2">
+                      Next
+                      <ArrowRight className="w-4 h-4" />
+                    </span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleSubmit}
+                    disabled={isSubmitting}
+                    className="flex-1 min-h-13 py-3 px-4 rounded-xl bg-teal hover:bg-teal/90 text-white text-sm font-bold shadow-lg shadow-teal/30 transition flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-60"
+                  >
+                    {isSubmitting ? (
+                      <span className="flex items-center gap-2">
+                        <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                        Submitting...
+                      </span>
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4" />
+                        Submit Survey
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
