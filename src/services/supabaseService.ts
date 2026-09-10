@@ -5,6 +5,9 @@ export const SupabaseService = {
   async insertRegistration(
     participant: Participant & { eventName: string }
   ): Promise<{ success: boolean; error?: string }> {
+    if (!supabase) {
+      return { success: false, error: 'Supabase not configured (missing VITE_SUPABASE_URL/VITE_SUPABASE_ANON_KEY)' };
+    }
     const { error } = await supabase.from('registrations').insert({
       participant_id: participant.id,
       code: participant.code,
