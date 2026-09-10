@@ -872,7 +872,7 @@ export const PreRegistrationForm: React.FC<PreRegistrationFormProps> = ({
         )}
 
         {/* STEP NAVIGATION FOOTER */}
-        <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-slate-100 pb-safe">
+        <div className="fixed bottom-0 left-0 right-0 z-40 bg-cream/95 backdrop-blur-lg border-t border-slate-100 pb-safe">
           <div className="max-w-xl mx-auto px-4 py-3 flex items-center gap-3">
             <button
               type="button"
