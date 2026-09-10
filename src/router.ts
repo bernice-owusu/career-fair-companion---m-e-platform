@@ -70,40 +70,21 @@ export function platformTargetFromPath(path: string): PlatformTarget {
   }
 }
 
-// Permanently mounted under /register for this deployment (proxied at
-// nexuscareersgh.com/register/* via nexus-webapp's next.config.ts rewrite,
-// and matching Vite's `base` in vite.config.ts) — direct access without the
-// prefix isn't supported. Every screen path below (e.g. /pre-register,
-// /walk-in, /checkin) is matched unprefixed; these two helpers are the only
-// place that adds/strips the /register boundary.
-const BASE_PATH = '/register';
-
-function stripBasePath(pathname: string): string {
-  if (pathname === BASE_PATH) return '/';
-  if (pathname.startsWith(BASE_PATH + '/')) return pathname.slice(BASE_PATH.length);
-  return pathname;
-}
-
-function withBasePath(pathname: string): string {
-  return pathname === '/' ? BASE_PATH : BASE_PATH + pathname;
-}
-
 // Tiny dependency-free history router so every flow screen has a real URL
 // e.g. /pre-register, /walk-in, /checkin. Works with the dev server and any
 // host that applies an SPA fallback (history mode).
 export function usePathname() {
-  const [pathname, setPathname] = useState<string>(() => stripBasePath(window.location.pathname));
+  const [pathname, setPathname] = useState<string>(() => window.location.pathname);
 
   useEffect(() => {
-    const onPop = () => setPathname(stripBasePath(window.location.pathname));
+    const onPop = () => setPathname(window.location.pathname);
     window.addEventListener('popstate', onPop);
     return () => window.removeEventListener('popstate', onPop);
   }, []);
 
   const navigate = useCallback((path: string) => {
-    const fullPath = withBasePath(path);
-    if (window.location.pathname !== fullPath) {
-      window.history.pushState({}, '', fullPath);
+    if (window.location.pathname !== path) {
+      window.history.pushState({}, '', path);
     }
     setPathname(path);
   }, []);

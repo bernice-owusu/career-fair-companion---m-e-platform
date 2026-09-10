@@ -225,7 +225,7 @@ return (
   }
 
   return (
-    <div className="min-h-screen bg-cream text-navy flex flex-col selection:bg-orange selection:text-white">
+    <div className="min-h-screen bg-navy text-mist flex flex-col selection:bg-orange selection:text-navy">
       {/* App header (shown everywhere except the standalone pre-registration page) */}
       <Header
         eventName={sessionParticipant?.eventId === EVENT_MONDAY.id ? EVENT_MONDAY.name : EVENT_FRIDAY.name}
@@ -312,13 +312,13 @@ onAskQuestion={() => goTo('/questions')}
                   <div className="max-w-xl mx-auto px-4 pt-4 flex gap-2">
                     <button
                       onClick={() => goTo('/questions')}
-                      className="flex-1 py-2.5 rounded-full bg-white border border-slate-100 text-slate-500 text-xs font-bold hover:border-orange/50 hover:text-navy transition"
+                      className="flex-1 py-2.5 rounded-xl bg-navy/80 border border-mist/20 text-mist/80 text-xs font-bold hover:border-orange/50 hover:text-white transition"
                     >
                       Ask a Question
                     </button>
                     <button
                       onClick={() => goTo('/ticket')}
-                      className="flex-1 py-2.5 rounded-full bg-white border border-slate-100 text-slate-500 text-xs font-bold hover:border-orange/50 hover:text-navy transition"
+                      className="flex-1 py-2.5 rounded-xl bg-navy/80 border border-mist/20 text-mist/80 text-xs font-bold hover:border-orange/50 hover:text-white transition"
                     >
                       Event Ticket
                     </button>
