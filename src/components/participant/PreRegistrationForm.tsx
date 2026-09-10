@@ -67,13 +67,13 @@ const STEP_FIELDS: string[][] = [
 ];
 
 const baseInputClass =
-  "w-full px-3.5 py-2.5 bg-navy border border-mist/25 rounded-xl text-sm text-white placeholder-mist/40 focus:outline-none focus:border-orange transition";
+  "w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-md text-sm text-navy placeholder:text-slate-300 focus:outline-none focus:border-orange transition";
 
 const selectionClass = (selected: boolean) =>
-  `flex items-center gap-2.5 p-2.5 rounded-xl border cursor-pointer transition text-left ${
+  `flex items-center gap-2.5 p-2.5 rounded-md border cursor-pointer transition text-left ${
     selected
-      ? "bg-orange/15 border-orange text-white"
-      : "bg-navy/60 border-mist/15 text-mist/80 hover:border-mist/30"
+      ? "bg-orange/15 border-orange text-navy"
+      : "bg-white border-slate-100 text-slate-500 hover:border-slate-300"
   }`;
 
 interface SectionProps {
@@ -92,16 +92,16 @@ const Section: React.FC<SectionProps> = ({
   subtitle,
   children,
 }) => (
-  <section className="bg-navy/90 border border-mist/15 rounded-3xl p-5 sm:p-6 space-y-5 shadow-md">
+  <section className="bg-white border border-slate-100 rounded-lg p-5 sm:p-6 space-y-5 shadow-card">
     <div className="flex items-start gap-3">
-      <span className="w-7 h-7 rounded-xl bg-orange/20 border border-orange/30 text-orange flex items-center justify-center text-xs font-black shrink-0">
+      <span className="w-7 h-7 rounded-full bg-orange/20 border border-orange/30 text-orange flex items-center justify-center text-xs font-black shrink-0">
         {num}
       </span>
       <div>
-        <h2 className="text-base font-bold text-white tracking-tight">
+        <h2 className="text-base font-bold text-navy tracking-tight">
           {title}
         </h2>
-        {subtitle && <p className="text-xs text-mist/60 mt-0.5">{subtitle}</p>}
+        {subtitle && <p className="text-xs text-slate-500 mt-0.5">{subtitle}</p>}
       </div>
     </div>
     {children}
@@ -112,8 +112,8 @@ const Label: React.FC<{ req?: boolean; children: React.ReactNode }> = ({
   req,
   children,
 }) => (
-  <label className="block text-xs font-bold uppercase tracking-wider text-orange mb-1.5">
-    {children} {req && <span className="text-rose-400">*</span>}
+  <label className="block text-xs font-bold uppercase tracking-wider text-navy mb-1.5">
+    {children} {req && <span className="text-error">*</span>}
   </label>
 );
 
@@ -306,7 +306,7 @@ export const PreRegistrationForm: React.FC<PreRegistrationFormProps> = ({
     errors[key] ? (
       <p
         data-field-error
-        className="text-[11px] text-rose-400 font-semibold mt-1"
+        className="text-[11px] text-error font-semibold mt-1"
       >
         {errors[key]}
       </p>
@@ -317,21 +317,21 @@ export const PreRegistrationForm: React.FC<PreRegistrationFormProps> = ({
       {/* Header */}
       <button
         onClick={goBack}
-        className="flex items-center gap-1.5 text-xs font-bold text-mist/60 hover:text-white transition mb-4"
+        className="flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-navy transition mb-4"
       >
         <ArrowLeft className="w-4 h-4" />
         <span>Back</span>
       </button>
 
       <div className="flex items-start gap-3 mb-5">
-        <div className="w-10 h-10 rounded-2xl bg-orange/20 border border-orange/30 text-orange flex items-center justify-center shrink-0">
+        <div className="w-10 h-10 rounded-full bg-orange/20 border border-orange/30 text-orange flex items-center justify-center shrink-0">
           <ShieldCheck className="w-5 h-5" />
         </div>
         <div>
-          <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-black text-navy tracking-tight">
             Professionals' Career Fair — Pre-Registration
           </h1>
-          <p className="text-xs sm:text-sm text-mist/60 mt-0.5">
+          <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
             Complete this form to pre-register for the Nexus 2026 Professionals'
             Career Fair. Your answers help us prepare a more personalised event
             and inform the M&E team.
@@ -340,21 +340,21 @@ export const PreRegistrationForm: React.FC<PreRegistrationFormProps> = ({
       </div>
 
       {/* Step Progress */}
-      <div className="mb-5 bg-navy/90 border border-mist/15 rounded-2xl p-4 shadow-md">
+      <div className="mb-5 bg-white border border-slate-100 rounded-lg p-4 shadow-card">
         <div className="flex items-end justify-between gap-3 mb-2">
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-orange block">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-navy block">
               Step {step + 1} of {STEP_TITLES.length}
             </span>
-            <span className="text-sm font-bold text-white">
+            <span className="text-sm font-bold text-navy">
               {STEP_TITLES[step]}
             </span>
           </div>
-          <span className="text-[11px] text-mist/60 font-mono shrink-0">
+          <span className="text-[11px] text-slate-500 font-mono shrink-0">
             {Math.round(((step + 1) / STEP_TITLES.length) * 100)}%
           </span>
         </div>
-        <div className="w-full h-2 bg-navy/70 rounded-full overflow-hidden border border-mist/15">
+        <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
           <div
             className="h-full bg-orange rounded-full transition-all duration-500"
             style={{ width: `${((step + 1) / STEP_TITLES.length) * 100}%` }}
@@ -419,7 +419,7 @@ export const PreRegistrationForm: React.FC<PreRegistrationFormProps> = ({
                   className={baseInputClass}
                 />
                 {renderFieldError("email")}
-                <p className="text-[11px] text-mist/60 mt-1">
+                <p className="text-[11px] text-slate-500 mt-1">
                   Your registration code will be sent to this email.
                 </p>
               </div>
@@ -451,7 +451,7 @@ export const PreRegistrationForm: React.FC<PreRegistrationFormProps> = ({
                   }
                   className={`${baseInputClass} font-mono`}
                 />
-                <p className="text-[11px] text-mist/60 mt-1 flex items-center gap-1">
+                <p className="text-[11px] text-slate-500 mt-1 flex items-center gap-1">
                   <Info className="w-3 h-3 shrink-0" />
                   You can enter 0000 if you do not have a PSGH registration
                   number yet.
@@ -501,7 +501,7 @@ export const PreRegistrationForm: React.FC<PreRegistrationFormProps> = ({
                 ))}
               </div>
               {form.currentAreaOfPractice === "Other" && (
-                <div className="bg-navy/70 border border-mist/15 rounded-xl p-3.5 space-y-1.5 animate-fadeIn">
+                <div className="bg-cream border border-slate-100 rounded-md p-3.5 space-y-1.5 animate-fadeIn">
                   <Label req>Please specify your area of practice</Label>
                   <input
                     type="text"
@@ -564,7 +564,7 @@ export const PreRegistrationForm: React.FC<PreRegistrationFormProps> = ({
                   </div>
                 </div>
                 {form.idealCareerPath === "Other" && (
-                  <div className="bg-navy/70 border border-mist/15 rounded-xl p-3.5 space-y-1.5 animate-fadeIn">
+                  <div className="bg-cream border border-slate-100 rounded-md p-3.5 space-y-1.5 animate-fadeIn">
                     <Label req>
                       Please specify your ideal career path or industry.
                     </Label>
@@ -612,7 +612,7 @@ export const PreRegistrationForm: React.FC<PreRegistrationFormProps> = ({
                 })}
               </div>
               {(form.careerFairExpectations || []).includes("Other") && (
-                <div className="bg-navy/70 border border-mist/15 rounded-xl p-3.5 space-y-1.5 animate-fadeIn">
+                <div className="bg-cream border border-slate-100 rounded-md p-3.5 space-y-1.5 animate-fadeIn">
                   <Label req>Please specify.</Label>
                   <input
                     type="text"
@@ -677,10 +677,10 @@ export const PreRegistrationForm: React.FC<PreRegistrationFormProps> = ({
                       type="button"
                       key={o}
                       onClick={() => update("skillsLabResumeAssistance", o)}
-                      className={`px-4 py-2 rounded-xl text-xs font-bold border transition ${
+                      className={`px-4 py-2 rounded-full text-xs font-bold border transition ${
                         form.skillsLabResumeAssistance === o
                           ? "bg-orange/20 border-orange text-orange"
-                          : "bg-navy/60 border-mist/15 text-mist/70 hover:border-mist/30"
+                          : "bg-white border-slate-100 text-slate-500 hover:border-slate-300"
                       }`}
                     >
                       {o}
@@ -699,10 +699,10 @@ export const PreRegistrationForm: React.FC<PreRegistrationFormProps> = ({
                       type="button"
                       key={n}
                       onClick={() => update("resumeQuality", n)}
-                      className={`flex-1 py-2 rounded-xl flex flex-col items-center gap-1 border transition ${
+                      className={`flex-1 py-2 rounded-md flex flex-col items-center gap-1 border transition ${
                         form.resumeQuality === n
                           ? "bg-orange/20 border-orange text-orange"
-                          : "bg-navy border-mist/15 text-mist/40 hover:border-mist/30"
+                          : "bg-white border-slate-100 text-slate-300 hover:border-slate-300"
                       }`}
                     >
                       <Star
@@ -713,7 +713,7 @@ export const PreRegistrationForm: React.FC<PreRegistrationFormProps> = ({
                   ))}
                 </div>
                 {form.resumeQuality && (
-                  <p className="text-[11px] text-mist/60 mt-1.5 text-center">
+                  <p className="text-[11px] text-slate-500 mt-1.5 text-center">
                     {RESUME_QUALITY_LABELS[form.resumeQuality]}
                   </p>
                 )}
@@ -734,7 +734,7 @@ export const PreRegistrationForm: React.FC<PreRegistrationFormProps> = ({
                     className={baseInputClass}
                   />
                 </div>
-                <p className="text-[11px] text-mist/60 mt-1.5">
+                <p className="text-[11px] text-slate-500 mt-1.5">
                   Paste a public link (e.g. Google Drive) to your résumé/CV.
                   This link is shared with the Skills Lab facilitators.
                 </p>
@@ -749,10 +749,10 @@ export const PreRegistrationForm: React.FC<PreRegistrationFormProps> = ({
                       type="button"
                       key={n}
                       onClick={() => update("interviewConfidence", n)}
-                      className={`flex-1 py-2 rounded-xl flex flex-col items-center gap-1 border transition ${
+                      className={`flex-1 py-2 rounded-md flex flex-col items-center gap-1 border transition ${
                         form.interviewConfidence === n
                           ? "bg-orange/20 border-orange text-orange"
-                          : "bg-navy border-mist/15 text-mist/40 hover:border-mist/30"
+                          : "bg-white border-slate-100 text-slate-300 hover:border-slate-300"
                       }`}
                     >
                       <span className="text-[10px] font-bold">{n}</span>
@@ -760,7 +760,7 @@ export const PreRegistrationForm: React.FC<PreRegistrationFormProps> = ({
                   ))}
                 </div>
                 {form.interviewConfidence && (
-                  <p className="text-[11px] text-mist/60 mt-1.5 text-center">
+                  <p className="text-[11px] text-slate-500 mt-1.5 text-center">
                     {INTERVIEW_CONFIDENCE_LABELS[form.interviewConfidence]}
                   </p>
                 )}
@@ -777,10 +777,10 @@ export const PreRegistrationForm: React.FC<PreRegistrationFormProps> = ({
                       type="button"
                       key={o}
                       onClick={() => update("mockInterview", o)}
-                      className={`px-4 py-2 rounded-xl text-xs font-bold border transition ${
+                      className={`px-4 py-2 rounded-full text-xs font-bold border transition ${
                         form.mockInterview === o
                           ? "bg-orange/20 border-orange text-orange"
-                          : "bg-navy/60 border-mist/15 text-mist/70 hover:border-mist/30"
+                          : "bg-white border-slate-100 text-slate-500 hover:border-slate-300"
                       }`}
                     >
                       {o}
@@ -816,7 +816,7 @@ export const PreRegistrationForm: React.FC<PreRegistrationFormProps> = ({
                   ))}
                 </div>
                 {form.heardAboutCareerFair === "Other" && (
-                  <div className="mt-2.5 bg-navy/70 border border-mist/15 rounded-xl p-3.5 space-y-1.5 animate-fadeIn">
+                  <div className="mt-2.5 bg-cream border border-slate-100 rounded-md p-3.5 space-y-1.5 animate-fadeIn">
                     <Label req>Please specify.</Label>
                     <input
                       type="text"
@@ -840,10 +840,10 @@ export const PreRegistrationForm: React.FC<PreRegistrationFormProps> = ({
                       type="button"
                       key={o}
                       onClick={() => update("attendedLastYear", o)}
-                      className={`px-4 py-2 rounded-xl text-xs font-bold border transition ${
+                      className={`px-4 py-2 rounded-full text-xs font-bold border transition ${
                         form.attendedLastYear === o
                           ? "bg-orange/20 border-orange text-orange"
-                          : "bg-navy/60 border-mist/15 text-mist/70 hover:border-mist/30"
+                          : "bg-white border-slate-100 text-slate-500 hover:border-slate-300"
                       }`}
                     >
                       {o}
@@ -872,12 +872,12 @@ export const PreRegistrationForm: React.FC<PreRegistrationFormProps> = ({
         )}
 
         {/* STEP NAVIGATION FOOTER */}
-        <div className="fixed bottom-0 left-0 right-0 z-40 bg-navy/95 backdrop-blur-lg border-t border-mist/15 pb-safe">
+        <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-slate-100 pb-safe">
           <div className="max-w-xl mx-auto px-4 py-3 flex items-center gap-3">
             <button
               type="button"
               onClick={goBack}
-              className="px-5 py-4 rounded-xl bg-navy/70 border border-mist/25 text-mist text-sm font-bold transition hover:border-mist/50 shrink-0"
+              className="px-5 py-4 rounded-full bg-white border border-slate-300 text-navy text-sm font-bold transition hover:border-slate-500 shrink-0"
             >
               {step === 0 ? "Cancel" : "Back"}
             </button>
@@ -885,7 +885,7 @@ export const PreRegistrationForm: React.FC<PreRegistrationFormProps> = ({
               <button
                 type="button"
                 onClick={goNext}
-                className="flex-1 py-4 px-6 rounded-xl bg-orange hover:bg-orange/90 text-white font-bold text-base shadow-lg shadow-orange/30 transition-colors flex items-center justify-center gap-2"
+                className="flex-1 py-4 px-6 rounded-full bg-orange hover:bg-orange/90 text-white font-bold text-base transition-colors flex items-center justify-center gap-2"
               >
                 <span>Next</span>
                 <ArrowRight className="w-5 h-5" />
@@ -894,7 +894,7 @@ export const PreRegistrationForm: React.FC<PreRegistrationFormProps> = ({
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex-1 py-4 px-6 rounded-xl bg-orange hover:bg-orange/90 text-white font-bold text-base shadow-lg shadow-orange/30 transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
+                className="flex-1 py-4 px-6 rounded-full bg-orange hover:bg-orange/90 text-white font-bold text-base transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
               >
                 {isSubmitting ? (
                   <span className="flex items-center gap-2">
@@ -910,7 +910,7 @@ export const PreRegistrationForm: React.FC<PreRegistrationFormProps> = ({
               </button>
             )}
           </div>
-          <p className="text-center text-[11px] text-mist/60 pb-2">
+          <p className="text-center text-[11px] text-slate-500 pb-2">
             {step < STEP_TITLES.length - 1
               ? `Your answers are saved as you go — Step ${step + 1} of ${STEP_TITLES.length}.`
               : "Your code will be sent to your email and shown on the next screen."}

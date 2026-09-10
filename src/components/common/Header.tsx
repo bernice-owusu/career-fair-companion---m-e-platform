@@ -14,7 +14,7 @@ export const Header: React.FC<HeaderProps> = ({
   onHome,
 }) => {
   return (
-    <header className="sticky top-0 z-30 bg-navy/90 backdrop-blur-md border-b border-mist/15 text-white px-4 py-3 sm:px-6">
+    <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-100 text-navy px-4 py-3 sm:px-6">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
         {/* Left Branding */}
         <button
@@ -24,13 +24,13 @@ export const Header: React.FC<HeaderProps> = ({
           <img
             src={logo}
             alt={`${eventName} logo`}
-            className="w-9 h-9 rounded-lg object-contain bg-navy shadow-md shadow-orange/20 border border-mist/15 shrink-0"
+            className="w-9 h-9 rounded-md object-contain bg-navy border border-slate-100 shrink-0"
           />
           <span className="min-w-0">
-            <span className="block text-sm sm:text-base font-bold text-mist truncate tracking-tight">
+            <span className="block text-sm sm:text-base font-bold text-navy truncate tracking-tight">
               Nexus Career Fair
             </span>
-            <span className="block text-[11px] sm:text-xs text-mist/60 truncate">
+            <span className="block text-[11px] sm:text-xs text-slate-500 truncate">
               {participantName
                 ? `Participant: ${participantName}`
                 : "Nexus 2026 · Digital Companion"}
@@ -39,7 +39,7 @@ export const Header: React.FC<HeaderProps> = ({
         </button>
 
         {/* Right Mark */}
-        {/* <div className="flex items-center gap-1.5 shrink-0 text-[11px] text-mist/60">
+        {/* <div className="flex items-center gap-1.5 shrink-0 text-[11px] text-slate-500">
           <Globe className="w-3.5 h-3.5 text-orange" />
           <span className="hidden sm:inline">2026</span>
         </div> */}

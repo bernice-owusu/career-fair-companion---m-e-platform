@@ -8,7 +8,7 @@ interface WalkInRegistrationFormProps {
 }
 
 const baseInputClass =
-  "w-full px-3.5 py-2.5 bg-navy border border-mist/25 rounded-xl text-sm text-white placeholder-mist/40 focus:outline-none focus:border-orange transition";
+  "w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-md text-sm text-navy placeholder:text-slate-300 focus:outline-none focus:border-orange transition";
 
 // Module-scope helper — must NOT be defined inside the render body, otherwise
 // a fresh component identity each render makes React remount the subtree on
@@ -18,7 +18,7 @@ const FieldError: React.FC<{
   errors: Record<string, string>;
 }> = ({ field, errors }) =>
   errors[field] ? (
-    <p className="text-[11px] text-rose-400 font-semibold mt-1">
+    <p className="text-[11px] text-error font-semibold mt-1">
       {errors[field]}
     </p>
   ) : null;
@@ -72,7 +72,7 @@ export const WalkInRegistrationForm: React.FC<WalkInRegistrationFormProps> = ({
     <div className="max-w-xl mx-auto px-4 py-8 animate-fadeIn">
       <button
         onClick={onCancel}
-        className="flex items-center gap-1.5 text-xs font-bold text-mist/60 hover:text-white transition mb-4"
+        className="flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-navy transition mb-4"
       >
         <ArrowLeft className="w-4 h-4" />
         <span>Back</span>
@@ -80,24 +80,24 @@ export const WalkInRegistrationForm: React.FC<WalkInRegistrationFormProps> = ({
 
       <form
         onSubmit={handleSubmit}
-        className="bg-navy/90 border border-mist/15 rounded-3xl p-5 sm:p-6 shadow-md space-y-5"
+        className="bg-white border border-slate-100 rounded-lg p-5 sm:p-6 shadow-card space-y-5"
       >
         <div className="text-center space-y-1.5">
-          <div className="w-12 h-12 rounded-2xl bg-orange/20 border border-orange/30 text-orange flex items-center justify-center mx-auto mb-2">
+          <div className="w-12 h-12 rounded-full bg-orange/20 border border-orange/30 text-orange flex items-center justify-center mx-auto mb-2">
             <UserPlus className="w-6 h-6" />
           </div>
-          <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-black text-navy tracking-tight">
             Register In Person
           </h1>
-          <p className="text-xs text-mist/60 max-w-sm mx-auto">
+          <p className="text-xs text-slate-500 max-w-sm mx-auto">
             A few quick details and you're in. You'll receive your registration
             code instantly.
           </p>
         </div>
 
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-orange mb-1.5">
-            Full Name <span className="text-rose-400">*</span>
+          <label className="block text-xs font-bold uppercase tracking-wider text-navy mb-1.5">
+            Full Name <span className="text-error">*</span>
           </label>
           <input
             type="text"
@@ -113,8 +113,8 @@ export const WalkInRegistrationForm: React.FC<WalkInRegistrationFormProps> = ({
         </div>
 
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-orange mb-1.5">
-            Email <span className="text-rose-400">*</span>
+          <label className="block text-xs font-bold uppercase tracking-wider text-navy mb-1.5">
+            Email <span className="text-error">*</span>
           </label>
           <input
             type="email"
@@ -130,8 +130,8 @@ export const WalkInRegistrationForm: React.FC<WalkInRegistrationFormProps> = ({
         </div>
 
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-orange mb-1.5">
-            Phone <span className="text-rose-400">*</span>
+          <label className="block text-xs font-bold uppercase tracking-wider text-navy mb-1.5">
+            Phone <span className="text-error">*</span>
           </label>
           <input
             type="tel"
@@ -147,8 +147,8 @@ export const WalkInRegistrationForm: React.FC<WalkInRegistrationFormProps> = ({
         </div>
 
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-orange mb-1.5">
-            Registration Number <span className="text-rose-400">*</span>
+          <label className="block text-xs font-bold uppercase tracking-wider text-navy mb-1.5">
+            Registration Number <span className="text-error">*</span>
           </label>
           <input
             type="text"
@@ -161,7 +161,7 @@ export const WalkInRegistrationForm: React.FC<WalkInRegistrationFormProps> = ({
             }}
             className={`${baseInputClass} font-mono`}
           />
-          <p className="text-[11px] text-mist/60 mt-1 flex items-center gap-1">
+          <p className="text-[11px] text-slate-500 mt-1 flex items-center gap-1">
             <Info className="w-3 h-3 shrink-0" />
             Don't have your PSGH registration number handy? Enter 0000 to
             proceed.
@@ -172,7 +172,7 @@ export const WalkInRegistrationForm: React.FC<WalkInRegistrationFormProps> = ({
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full py-4 px-6 rounded-xl bg-orange hover:bg-orange/90 text-white font-bold text-base shadow-lg shadow-orange/30 transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
+          className="w-full py-4 px-6 rounded-full bg-orange hover:bg-orange/90 text-white font-bold text-base transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
         >
           {isSubmitting ? (
             <span className="flex items-center gap-2">
