@@ -10,12 +10,12 @@ interface MondayRegistrationFormProps {
 }
 
 const baseInputClass =
-  'w-full px-3.5 py-2.5 bg-navy border border-mist/25 rounded-xl text-sm text-white placeholder-mist/40 focus:outline-none focus:border-orange transition';
+  'w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-md text-sm text-navy placeholder:text-slate-300 focus:outline-none focus:border-orange transition';
 
 const YEAR_OF_STUDY_OPTIONS = ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5', 'Year 6', 'Other'];
 
 const FieldError: React.FC<{ field: string; errors: Record<string, string> }> = ({ field, errors }) =>
-  errors[field] ? <p className="text-[11px] text-rose-400 font-semibold mt-1">{errors[field]}</p> : null;
+  errors[field] ? <p className="text-[11px] text-error font-semibold mt-1">{errors[field]}</p> : null;
 
 export const MondayRegistrationForm: React.FC<MondayRegistrationFormProps> = ({ event, onSubmit, onCancel }) => {
   const config = StorageService.getConfig();
@@ -60,29 +60,29 @@ export const MondayRegistrationForm: React.FC<MondayRegistrationFormProps> = ({ 
     <div className="max-w-xl mx-auto px-4 py-8 animate-fadeIn">
       <button
         onClick={onCancel}
-        className="flex items-center gap-1.5 text-xs font-bold text-mist/60 hover:text-white transition mb-4"
+        className="flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-navy transition mb-4"
       >
         <ArrowLeft className="w-4 h-4" />
         <span>Back</span>
       </button>
 
-      <form onSubmit={handleSubmit} className="bg-navy/90 border border-mist/15 rounded-3xl p-5 sm:p-6 shadow-md space-y-5">
+      <form onSubmit={handleSubmit} className="bg-white border border-slate-100 rounded-lg p-5 sm:p-6 shadow-card space-y-5">
         <div className="text-center space-y-1.5">
-          <div className="w-12 h-12 rounded-2xl bg-orange/20 border border-orange/30 text-orange flex items-center justify-center mx-auto mb-2">
+          <div className="w-12 h-12 rounded-full bg-orange/20 border border-orange/30 text-orange flex items-center justify-center mx-auto mb-2">
             <GraduationCap className="w-6 h-6" />
           </div>
-          <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-black text-navy tracking-tight">
             Students' Career Fair — Register
           </h1>
-          <p className="text-xs text-mist/60 max-w-sm mx-auto">
+          <p className="text-xs text-slate-500 max-w-sm mx-auto">
             {event.name} · {event.date} · {event.time} · {event.venue}
           </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-orange mb-1.5">
-              First Name <span className="text-rose-400">*</span>
+            <label className="block text-xs font-bold uppercase tracking-wider text-navy mb-1.5">
+              First Name <span className="text-error">*</span>
             </label>
             <input
               type="text"
@@ -95,8 +95,8 @@ export const MondayRegistrationForm: React.FC<MondayRegistrationFormProps> = ({ 
           </div>
 
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-orange mb-1.5">
-              Surname <span className="text-rose-400">*</span>
+            <label className="block text-xs font-bold uppercase tracking-wider text-navy mb-1.5">
+              Surname <span className="text-error">*</span>
             </label>
             <input
               type="text"
@@ -111,7 +111,7 @@ export const MondayRegistrationForm: React.FC<MondayRegistrationFormProps> = ({ 
 
         <div>
           <label className="block text-xs font-bold uppercase tracking-wider text-orange mb-1.5">
-            Email <span className="text-rose-400">*</span>
+            Email <span className="text-error">*</span>
           </label>
           <input
             type="email"
@@ -125,7 +125,7 @@ export const MondayRegistrationForm: React.FC<MondayRegistrationFormProps> = ({ 
 
         <div>
           <label className="block text-xs font-bold uppercase tracking-wider text-orange mb-1.5">
-            Institution / School <span className="text-rose-400">*</span>
+            Institution / School <span className="text-error">*</span>
           </label>
           <select
             value={institution}
@@ -140,7 +140,7 @@ export const MondayRegistrationForm: React.FC<MondayRegistrationFormProps> = ({ 
 
         <div>
           <label className="block text-xs font-bold uppercase tracking-wider text-orange mb-1.5">
-            Year of Study <span className="text-rose-400">*</span>
+            Year of Study <span className="text-error">*</span>
           </label>
           <select
             value={yearOfStudy}
@@ -150,7 +150,7 @@ export const MondayRegistrationForm: React.FC<MondayRegistrationFormProps> = ({ 
             <option value="">Select your year...</option>
             {YEAR_OF_STUDY_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
           </select>
-          <p className="text-[11px] text-mist/60 mt-1 flex items-center gap-1">
+          <p className="text-[11px] text-slate-500 mt-1 flex items-center gap-1">
             <Info className="w-3 h-3 shrink-0" />
             All pharmacy and health-science students are welcome.
           </p>
@@ -160,7 +160,7 @@ export const MondayRegistrationForm: React.FC<MondayRegistrationFormProps> = ({ 
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full py-4 px-6 rounded-xl bg-orange hover:bg-orange/90 text-white font-bold text-base shadow-lg shadow-orange/30 transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
+          className="w-full py-4 px-6 rounded-full bg-orange hover:bg-orange/90 text-white font-bold text-base transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
         >
           {isSubmitting ? (
             <span className="flex items-center gap-2">

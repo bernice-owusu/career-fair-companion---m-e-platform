@@ -36,10 +36,10 @@ const StarRating: React.FC<{
           onClick={() => onChange(n)}
           aria-pressed={value === n}
           aria-label={`${n} star${n > 1 ? 's' : ''}`}
-          className={`flex-1 min-h-14 rounded-xl flex flex-col items-center justify-center gap-1 border transition active:scale-95 ${
+          className={`flex-1 min-h-14 rounded-md flex flex-col items-center justify-center gap-1 border transition active:scale-95 ${
             value >= n
               ? 'bg-orange/20 border-orange text-orange'
-              : 'bg-navy border-mist/15 text-mist/40 hover:border-mist/30'
+              : 'bg-white border-slate-100 text-slate-300 hover:border-slate-300'
           }`}
         >
           <Star className={`w-5 h-5 ${value >= n ? 'fill-orange text-orange' : ''}`} />
@@ -47,7 +47,7 @@ const StarRating: React.FC<{
         </button>
       ))}
     </div>
-    <div className="flex justify-between text-[10px] text-mist/40 px-1 mt-1.5">
+    <div className="flex justify-between text-[10px] text-slate-300 px-1 mt-1.5">
       <span>{startLabel}</span>
       <span>{endLabel}</span>
     </div>
@@ -66,10 +66,10 @@ const ChoiceButtons: React.FC<{
         key={o}
         onClick={() => onChange(o)}
         aria-pressed={value === o}
-        className={`w-full min-h-12 px-4 py-2.5 rounded-xl text-sm font-bold border transition active:scale-95 ${
+        className={`w-full min-h-12 px-4 py-2.5 rounded-full text-sm font-bold border transition active:scale-95 ${
           value === o
             ? 'bg-orange/20 border-orange text-orange'
-            : 'bg-navy border-mist/15 text-mist/70 hover:border-mist/30'
+            : 'bg-white border-slate-100 text-slate-500 hover:border-slate-300'
         }`}
       >
         {o}
@@ -88,7 +88,7 @@ const TextQuestion: React.FC<{
     placeholder={placeholder}
     value={value}
     onChange={e => onChange(e.target.value)}
-    className="w-full px-3.5 py-2.5 bg-navy border border-mist/25 rounded-xl text-sm text-white placeholder-mist/40 focus:outline-none focus:border-orange resize-none transition min-h-24"
+    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-md text-sm text-navy placeholder:text-slate-300 focus:outline-none focus:border-orange resize-none transition min-h-24"
   />
 );
 
@@ -168,25 +168,25 @@ export const MondaySurveyModal: React.FC<MondaySurveyModalProps> = ({ participan
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-navy/80 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-navy border border-mist/15 rounded-3xl w-full max-w-xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh]">
+      <div className="bg-white border border-slate-100 rounded-lg w-full max-w-xl overflow-hidden shadow-lifted flex flex-col max-h-[92vh]">
         {/* Header */}
-        <div className="p-4 sm:p-5 border-b border-mist/15 flex items-center justify-between gap-3">
+        <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-9 h-9 rounded-xl bg-orange/20 text-orange flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-full bg-orange/20 text-orange flex items-center justify-center shrink-0">
               <Star className="w-4 h-4 fill-orange" />
             </div>
             <div className="min-w-0">
-              <h2 className="text-sm sm:text-base font-bold text-white truncate">
+              <h2 className="text-sm sm:text-base font-bold text-navy truncate">
                 Students' Fair — Post-Event Survey
               </h2>
-              <p className="text-[11px] text-mist/60">
+              <p className="text-[11px] text-slate-500">
                 Help the M&E team evaluate today's impact
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg text-mist/60 hover:text-white hover:bg-navy/60 transition shrink-0"
+            className="p-2 rounded-md text-slate-500 hover:text-navy hover:bg-slate-100 transition shrink-0"
             aria-label="Close survey"
           >
             <X className="w-5 h-5" />
@@ -197,12 +197,12 @@ export const MondaySurveyModal: React.FC<MondaySurveyModalProps> = ({ participan
         <div ref={bodyRef} className="p-4 sm:p-5 overflow-y-auto space-y-4 flex-1">
           {submitted ? (
             <div className="text-center py-8 space-y-4 animate-fadeIn">
-              <div className="w-16 h-16 rounded-full bg-teal/20 border-2 border-teal/50 flex items-center justify-center text-mist mx-auto">
+              <div className="w-16 h-16 rounded-full bg-teal/20 border-2 border-teal/50 flex items-center justify-center text-teal mx-auto">
                 <CheckCircle2 className="w-8 h-8" />
               </div>
               <div className="space-y-1">
-                <h3 className="text-xl font-bold text-white">Thank You for Your Feedback!</h3>
-                <p className="text-xs text-mist/80 max-w-sm mx-auto">
+                <h3 className="text-xl font-bold text-navy">Thank You for Your Feedback!</h3>
+                <p className="text-xs text-slate-500 max-w-sm mx-auto">
                   Your responses have been recorded in the central M&E dataset.
                 </p>
               </div>
@@ -211,7 +211,7 @@ export const MondaySurveyModal: React.FC<MondaySurveyModalProps> = ({ participan
                   if (savedSurvey) onSuccess(savedSurvey);
                   onClose();
                 }}
-                className="w-full py-3.5 px-4 rounded-xl bg-teal hover:bg-teal/90 text-white font-bold text-sm shadow-lg shadow-teal/30 transition active:scale-[0.98]"
+                className="w-full py-3.5 px-4 rounded-full bg-teal hover:bg-teal/90 text-white font-bold text-sm transition active:scale-[0.98]"
               >
                 Back to Dashboard
               </button>
@@ -221,12 +221,12 @@ export const MondaySurveyModal: React.FC<MondaySurveyModalProps> = ({ participan
               {/* Progress */}
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-orange">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-navy">
                     {isReviewStep ? 'Review & Submit' : `Question ${step + 1} of ${QUESTION_COUNT}`}
                   </span>
-                  <span className="text-[11px] text-mist/60 font-mono">{progress}%</span>
+                  <span className="text-[11px] text-slate-500 font-mono">{progress}%</span>
                 </div>
-                <div className="h-1.5 rounded-full bg-navy overflow-hidden">
+                <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
                   <div
                     className="h-full bg-orange rounded-full transition-all duration-300"
                     style={{ width: `${progress}%` }}
@@ -245,7 +245,7 @@ export const MondaySurveyModal: React.FC<MondaySurveyModalProps> = ({ participan
                           ? 'bg-orange/60 hover:bg-orange'
                           : i === step
                             ? 'bg-orange'
-                            : 'bg-mist/15'
+                            : 'bg-slate-100'
                       }`}
                     />
                   ))}
@@ -254,12 +254,12 @@ export const MondaySurveyModal: React.FC<MondaySurveyModalProps> = ({ participan
 
               {/* Question / Review */}
               {!isReviewStep ? (
-                <div key={step} className="bg-navy/70 border border-mist/15 rounded-2xl p-4 space-y-2 animate-fadeIn">
-                  <label className="block text-sm font-bold text-white">
+                <div key={step} className="bg-cream border border-slate-100 rounded-lg p-4 space-y-2 animate-fadeIn">
+                  <label className="block text-sm font-bold text-navy">
                     {step + 1}. {STEP_TITLES[step]}
-                    {step < 5 && <span className="text-rose-400"> *</span>}
+                    {step < 5 && <span className="text-error"> *</span>}
                   </label>
-                  <p className="text-[11px] text-mist/50 -mt-1">
+                  <p className="text-[11px] text-slate-500 -mt-1">
                     {step === 0 && 'Rate today\u2019s session overall.'}
                     {step === 1 && 'How well organised did the event feel?'}
                     {step === 2 && 'Did you find the networking opportunities useful?'}
@@ -324,24 +324,24 @@ export const MondaySurveyModal: React.FC<MondaySurveyModalProps> = ({ participan
                 </div>
               ) : (
                 <div className="space-y-3 animate-fadeIn">
-                  <div className="bg-navy/70 border border-mist/15 rounded-2xl p-4">
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-orange mb-3">
+                  <div className="bg-cream border border-slate-100 rounded-lg p-4">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-navy mb-3">
                       Review your answers
                     </h3>
                     <div className="space-y-2.5">
                       {reviewItems.map((item, i) => (
                         <div
                           key={i}
-                          className="flex items-start justify-between gap-3 border-b border-mist/10 last:border-0 pb-2.5 last:pb-0"
+                          className="flex items-start justify-between gap-3 border-b border-slate-100 last:border-0 pb-2.5 last:pb-0"
                         >
                           <div className="min-w-0">
-                            <p className="text-[11px] text-mist/60">{i + 1}. {item.label}</p>
-                            <p className="text-sm font-semibold text-white">{item.value}</p>
+                            <p className="text-[11px] text-slate-500">{i + 1}. {item.label}</p>
+                            <p className="text-sm font-semibold text-navy">{item.value}</p>
                           </div>
                           <button
                             type="button"
                             onClick={() => { setStep(i); scrollTop(); }}
-                            className="p-1.5 rounded-lg text-mist/50 hover:text-white hover:bg-navy/60 transition shrink-0"
+                            className="p-1.5 rounded-md text-slate-500 hover:text-navy hover:bg-slate-100 transition shrink-0"
                             aria-label={`Edit answer for question ${i + 1}`}
                           >
                             <Pencil className="w-4 h-4" />
@@ -350,7 +350,7 @@ export const MondaySurveyModal: React.FC<MondaySurveyModalProps> = ({ participan
                       ))}
                     </div>
                   </div>
-                  <p className="text-[11px] text-mist/50 text-center">
+                  <p className="text-[11px] text-slate-500 text-center">
                     You can go back to edit any answer before submitting.
                   </p>
                 </div>
@@ -362,7 +362,7 @@ export const MondaySurveyModal: React.FC<MondaySurveyModalProps> = ({ participan
                   <button
                     type="button"
                     onClick={goBack}
-                    className="px-4 min-h-13 py-3 rounded-xl bg-navy/70 hover:bg-navy/60 text-mist/80 text-sm font-bold border border-mist/20 transition flex items-center gap-1.5 active:scale-[0.98]"
+                    className="px-4 min-h-13 py-3 rounded-full bg-white hover:bg-slate-100 text-slate-500 text-sm font-bold border border-slate-300 transition flex items-center gap-1.5 active:scale-[0.98]"
                   >
                     <ArrowLeft className="w-4 h-4" />
                     Back
@@ -373,7 +373,7 @@ export const MondaySurveyModal: React.FC<MondaySurveyModalProps> = ({ participan
                     type="button"
                     onClick={goNext}
                     disabled={isMoving}
-                    className="flex-1 min-h-13 py-3 px-4 rounded-xl bg-orange hover:bg-orange/90 text-white text-sm font-bold shadow-lg shadow-orange/25 transition active:scale-[0.98] disabled:opacity-60"
+                    className="flex-1 min-h-13 py-3 px-4 rounded-full bg-orange hover:bg-orange/90 text-white text-sm font-bold transition active:scale-[0.98] disabled:opacity-60"
                   >
                     <span className="flex items-center justify-center gap-2">
                       Next
@@ -385,7 +385,7 @@ export const MondaySurveyModal: React.FC<MondaySurveyModalProps> = ({ participan
                     type="button"
                     onClick={handleSubmit}
                     disabled={isSubmitting}
-                    className="flex-1 min-h-13 py-3 px-4 rounded-xl bg-teal hover:bg-teal/90 text-white text-sm font-bold shadow-lg shadow-teal/30 transition flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-60"
+                    className="flex-1 min-h-13 py-3 px-4 rounded-full bg-teal hover:bg-teal/90 text-white text-sm font-bold transition flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-60"
                   >
                     {isSubmitting ? (
                       <span className="flex items-center gap-2">

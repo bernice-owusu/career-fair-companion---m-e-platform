@@ -47,11 +47,11 @@ export const SaveTicketButton: React.FC<SaveTicketButtonProps> = ({ participant,
       <button
         onClick={handleSave}
         disabled={state === 'saving'}
-        className={`w-full py-3.5 px-6 rounded-xl border font-semibold text-sm transition-colors flex items-center justify-center gap-2 ${
+        className={`w-full py-3.5 px-6 rounded-full border font-semibold text-sm transition-colors flex items-center justify-center gap-2 ${
           state === 'done'
             ? 'border-teal/60 text-teal bg-teal/10'
             : state === 'error'
-              ? 'border-rose-800 text-rose-400 bg-rose-950/60'
+              ? 'border-error/30 text-error bg-error/10'
               : 'border-teal/40 text-teal hover:bg-teal/10 hover:text-teal'
         } ${state === 'saving' ? 'opacity-60 cursor-wait' : ''}`}
       >
