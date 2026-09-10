@@ -1,5 +1,6 @@
 import { StorageService } from './storageService';
 import { GoogleSheetsService } from './googleSheetsService';
+import { SupabaseService } from './supabaseService';
 import { Participant, PreRegistrationData, WalkInRegistrationData, MondayRegistrationData, AttendanceRecord } from '../types';
 import { EVENT_FRIDAY, getEventById } from '../events';
 
@@ -83,12 +84,30 @@ export const RegistrationService = {
     });
   },
 
-  // Fires the registration payload to Google Sheets (also triggers the code email in Apps Script)
+  // Fires the registration payload to Google Sheets (also triggers the code email in Apps
+  // Script) and, independently, to Supabase. The two writes run concurrently and neither
+  // blocks or is masked by the other — this function's return value reflects only the
+  // Sheets result (unchanged from before), so every existing caller's behavior is
+  // untouched. A failed Supabase insert is logged, never surfaced to the caller/UI.
   async syncRegistration(participant: Participant): Promise<{ success: boolean; message?: string; error?: string; configured?: boolean }> {
-    return GoogleSheetsService.sendWebhook('register', {
+    const enriched = {
       ...participant,
       eventId: participant.eventId,
       eventName: getEventById(participant.eventId).name
-    });
+    };
+
+    const [sheetsResult, supabaseResult] = await Promise.allSettled([
+      GoogleSheetsService.sendWebhook('register', enriched),
+      SupabaseService.insertRegistration(enriched),
+    ]);
+
+    if (supabaseResult.status === 'rejected') {
+      console.error('Supabase registration insert failed:', supabaseResult.reason);
+    } else if (!supabaseResult.value.success) {
+      console.error('Supabase registration insert failed:', supabaseResult.value.error);
+    }
+
+    if (sheetsResult.status === 'fulfilled') return sheetsResult.value;
+    return { success: false, error: 'Sheets sync failed' };
   }
 };
