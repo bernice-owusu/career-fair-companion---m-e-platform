@@ -62,7 +62,10 @@ export const MondayAnalytics: React.FC<MondayAnalyticsProps> = ({ event, onBack 
     return (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(1);
   };
 
-  const yesCount = (field: string) => surveys.filter(s => s.responses[field] === 'Yes').length;
+  const connectedWithFacilitatorCount = surveys.filter(s => {
+    const v = s.responses.facilitatorsConnected;
+    return Array.isArray(v) && v.length > 0 && !(v.length === 1 && v[0] === 'None');
+  }).length;
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 space-y-5 pb-24">
@@ -216,8 +219,8 @@ export const MondayAnalytics: React.FC<MondayAnalyticsProps> = ({ event, onBack 
               <p className="text-[10px] text-mist/60 mt-0.5">Avg Return (1-5)</p>
             </div>
             <div className="bg-navy/70 border border-mist/15 rounded-xl p-3 text-center">
-              <p className="text-2xl font-black text-teal">{yesCount('networkingUseful')}</p>
-              <p className="text-[10px] text-mist/60 mt-0.5">Found Networking Useful</p>
+              <p className="text-2xl font-black text-teal">{connectedWithFacilitatorCount}</p>
+              <p className="text-[10px] text-mist/60 mt-0.5">Connected With a Facilitator</p>
             </div>
           </div>
         )}
@@ -321,7 +324,7 @@ export const MondayAnalytics: React.FC<MondayAnalyticsProps> = ({ event, onBack 
               {[
                 ['Session rating', String(selectedSurvey.responses.sessionValue ?? '')],
                 ['Organisation', String(selectedSurvey.responses.eventOrganisation ?? '')],
-                ['Networking useful', String(selectedSurvey.responses.networkingUseful ?? '')],
+                ['Facilitators connected', Array.isArray(selectedSurvey.responses.facilitatorsConnected) ? selectedSurvey.responses.facilitatorsConnected.join(', ') : ''],
                 ['Connect with companies', String(selectedSurvey.responses.connectWithCompanies ?? '')],
                 ['Return likelihood', String(selectedSurvey.responses.returnLikelihood ?? '')],
                 ['Future themes', String(selectedSurvey.responses.suggestedThemes ?? '')],

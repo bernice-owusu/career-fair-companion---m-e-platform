@@ -396,7 +396,6 @@ onAskQuestion={() => goTo('/questions')}
             onSignOut={handleSignOut}
             onPreRegistered={() => goTo('/checkin')}
             onWalkIn={() => goTo('/walk-in')}
-            onMondayRegister={() => goTo('/monday')}
           />
         )}
 
@@ -410,7 +409,6 @@ onAskQuestion={() => goTo('/questions')}
             onSignOut={handleSignOut}
             onPreRegistered={() => goTo('/checkin')}
             onWalkIn={() => goTo('/walk-in')}
-            onMondayRegister={() => goTo('/monday')}
           />
         )}
       </main>

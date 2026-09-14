@@ -43,7 +43,7 @@ export const BoothDirectory: React.FC<BoothDirectoryProps> = ({
           <span>Explore Booths</span>
         </h1>
         <p className="text-xs sm:text-sm text-slate-500 mt-1">
-          Attend sessions, interact with facilitators, and ask for their booth code to verify your visit.
+          Attend sessions, interact with facilitators, and find their booth code displayed at the booth to verify your visit.
         </p>
       </div>
 

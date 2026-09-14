@@ -64,7 +64,7 @@ export const MondayRegistrationPage: React.FC<MondayRegistrationPageProps> = ({
         </h1>
 
         <p className="text-base sm:text-lg text-slate-500 font-semibold mt-6 max-w-xl mx-auto leading-relaxed">
-          Are you a pharmacy or health-science student ready to explore your
+          Are you a pharmacy student ready to explore your
           future career while learning from industry leaders?
         </p>
       </div>
@@ -84,7 +84,7 @@ export const MondayRegistrationPage: React.FC<MondayRegistrationPageProps> = ({
         <p className="text-sm sm:text-base text-slate-500 leading-relaxed mt-4">
           Discover exciting opportunities, ask our panel of experts your career
           questions, and gain insights that will shape your professional
-          journey. All pharmacy and health-science students are welcome.{" "}
+          journey. All pharmacy students are welcome.{" "}
           <span className="font-bold text-orange">Register now!</span>
         </p>
 

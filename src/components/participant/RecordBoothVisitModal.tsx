@@ -55,7 +55,7 @@ export const RecordBoothVisitModal: React.FC<RecordBoothVisitModalProps> = ({
     setIsSubmitting(false);
 
     if (!result.success || !result.visit) {
-      setErrorMsg(result.error || 'Verification failed. Please check the booth code and facilitator.');
+      setErrorMsg(result.error || 'Verification failed. Please check the booth code.');
       return;
     }
 
@@ -85,7 +85,7 @@ export const RecordBoothVisitModal: React.FC<RecordBoothVisitModalProps> = ({
                 Record Booth Visit
               </h2>
               <p className="text-[11px] text-slate-500">
-                Verify session with facilitator code
+                Verify your visit with the booth code
               </p>
             </div>
           </div>
@@ -184,7 +184,7 @@ export const RecordBoothVisitModal: React.FC<RecordBoothVisitModalProps> = ({
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. CV4827 (Ask the facilitator)"
+                  placeholder="e.g. CV4827"
                   value={boothCode}
                   onChange={(e) => {
                     setBoothCode(e.target.value.toUpperCase());
@@ -193,7 +193,7 @@ export const RecordBoothVisitModal: React.FC<RecordBoothVisitModalProps> = ({
                   className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-md text-sm text-navy font-mono uppercase tracking-wider placeholder:text-slate-300 focus:outline-none focus:border-orange"
                 />
                 <p className="text-[11px] text-slate-500 mt-1">
-                  Ask the facilitator at the booth for the official verification code.
+                  Enter the code displayed at the booth.
                 </p>
               </div>
 

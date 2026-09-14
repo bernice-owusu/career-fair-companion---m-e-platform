@@ -115,7 +115,7 @@ export const MondayRegistrationForm: React.FC<MondayRegistrationFormProps> = ({ 
           </label>
           <input
             type="email"
-            placeholder="e.g. you@studentmail.edu"
+            placeholder="e.g. you@example.com"
             value={email}
             onChange={e => { setEmail(e.target.value); setError('email', ''); }}
             className={baseInputClass}
@@ -152,7 +152,7 @@ export const MondayRegistrationForm: React.FC<MondayRegistrationFormProps> = ({ 
           </select>
           <p className="text-[11px] text-slate-500 mt-1 flex items-center gap-1">
             <Info className="w-3 h-3 shrink-0" />
-            All pharmacy and health-science students are welcome.
+            All pharmacy students are welcome.
           </p>
           <FieldError field="yearOfStudy" errors={errors} />
         </div>

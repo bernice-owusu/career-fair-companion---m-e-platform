@@ -37,13 +37,8 @@ export const DEFAULT_CONFIG: EventConfig = {
     collectReferral: true,
     institutionsList: [
       "University of Ghana (UG)",
-      "KNUST",
-      "University of Cape Coast (UCC)",
-      "Ashesi University",
-      "Ghana Communication Technology University (GCTU)",
-      "UPSA",
-      "Technical University",
-      "Other / Self-Taught"
+      "Entrance University College",
+      "Central University"
     ],
     careerInterestsList: [
       "Software Engineering & AI",
@@ -775,7 +770,7 @@ export class StorageService {
 
     // Check booth code matching (case-insensitive & trimmed)
     if (booth.boothCode.trim().toUpperCase() !== enteredCode.trim().toUpperCase()) {
-      return { success: false, error: "Invalid booth code. Please check the code with the facilitator." };
+      return { success: false, error: "Invalid booth code. Please check the code displayed at the booth." };
     }
 
     // Check facilitator validity

@@ -22,7 +22,6 @@ interface WelcomeGateProps {
   onSignOut: () => void;
   onPreRegistered: () => void;
   onWalkIn: () => void;
-  onMondayRegister: () => void;
 }
 
 export const WelcomeGate: React.FC<WelcomeGateProps> = ({
@@ -33,7 +32,6 @@ export const WelcomeGate: React.FC<WelcomeGateProps> = ({
   onSignOut,
   onPreRegistered,
   onWalkIn,
-  onMondayRegister,
 }) => {
   const activeSession = !!session && !!sessionParticipant;
 
@@ -151,19 +149,6 @@ export const WelcomeGate: React.FC<WelcomeGateProps> = ({
           <p className="text-center text-[11px] text-slate-500 -mt-1">
             Register in person in less than a minute.
           </p>
-
-          {/* Monday Students' fair — separate event entry */}
-          {/* <button
-            onClick={onMondayRegister}
-            className="w-full py-4 px-6 rounded-2xl bg-navy/80 border border-mist/20 text-mist/80 text-sm font-semibold transition-colors hover:border-blue/60 hover:text-white flex items-center justify-center gap-3"
-          >
-            <Star className="w-5 h-5 text-blue" />
-            <span>Monday · Students' Career Fair — student registration</span>
-            <ArrowRight className="w-4 h-4 ml-1" />
-          </button>
-          <p className="text-center text-[11px] text-mist/50 -mt-1">
-            Students' fair on Monday 21 Sep · Public Health Auditorium
-          </p> */}
         </div>
       )}
 

@@ -240,8 +240,7 @@ export const FridayPreRegistrationPage: React.FC<
 
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 mt-6">
           <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-slate-500 border border-slate-100 rounded-full px-3 py-1.5">
-            <Calendar className="w-3.5 h-3.5 text-teal" /> Monday · Students /
-            Friday · Professionals
+            <Calendar className="w-3.5 h-3.5 text-teal" /> Friday, September 25
           </span>
           <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-slate-500 border border-slate-100 rounded-full px-3 py-1.5">
             <Clock className="w-3.5 h-3.5 text-teal" /> 1:00 PM GMT

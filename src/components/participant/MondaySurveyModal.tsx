@@ -10,16 +10,23 @@ interface MondaySurveyModalProps {
 }
 
 const QUESTION_COUNT = 7;
-const STEP_QUESTION_IDS = ['sessionValue', 'organisation', 'networkingUseful', 'connectWithCompanies', 'returnLikelihood', 'themes', 'improvements'] as const;
+const STEP_QUESTION_IDS = ['sessionValue', 'organisation', 'facilitatorsConnected', 'connectWithCompanies', 'returnLikelihood', 'themes', 'improvements'] as const;
 const STEP_TITLES = [
   'Today\u2019s session',
   'Event organisation',
-  'Networking useful?',
+  'Facilitators connected',
   'Connect with companies?',
   'Attend again?',
   'Future themes',
   'Improvements',
 ];
+
+const FACILITATOR_OPTIONS = [
+  'Pharm. Eunice Baiden Laryea',
+  'Dr. (Pharm.) Darius Obeng Essah',
+  'Pharm. Alexis Banie',
+];
+const NONE_OPTION = 'None';
 
 const StarRating: React.FC<{
   value: number;
@@ -78,6 +85,46 @@ const ChoiceButtons: React.FC<{
   </div>
 );
 
+const MultiChoiceButtons: React.FC<{
+  value: string[];
+  onChange: (next: string[]) => void;
+  options: string[];
+  noneOption: string;
+}> = ({ value, onChange, options, noneOption }) => {
+  const toggle = (o: string) => {
+    if (o === noneOption) {
+      onChange(value.includes(noneOption) ? [] : [noneOption]);
+      return;
+    }
+    const withoutNone = value.filter(v => v !== noneOption);
+    onChange(
+      withoutNone.includes(o)
+        ? withoutNone.filter(v => v !== o)
+        : [...withoutNone, o]
+    );
+  };
+
+  return (
+    <div className="grid gap-2 pt-1">
+      {[...options, noneOption].map(o => (
+        <button
+          type="button"
+          key={o}
+          onClick={() => toggle(o)}
+          aria-pressed={value.includes(o)}
+          className={`w-full min-h-12 px-4 py-2.5 rounded-full text-sm font-bold border transition active:scale-95 ${
+            value.includes(o)
+              ? 'bg-orange/20 border-orange text-orange'
+              : 'bg-white border-slate-100 text-slate-500 hover:border-slate-300'
+          }`}
+        >
+          {o}
+        </button>
+      ))}
+    </div>
+  );
+};
+
 const TextQuestion: React.FC<{
   value: string;
   onChange: (v: string) => void;
@@ -96,7 +143,7 @@ export const MondaySurveyModal: React.FC<MondaySurveyModalProps> = ({ participan
   const [step, setStep] = useState(0);
   const [sessionValue, setSessionValue] = useState(5);
   const [organisation, setOrganisation] = useState(5);
-  const [networkingUseful, setNetworkingUseful] = useState('');
+  const [facilitatorsConnected, setFacilitatorsConnected] = useState<string[]>([]);
   const [connectWithCompanies, setConnectWithCompanies] = useState('');
   const [returnLikelihood, setReturnLikelihood] = useState(5);
   const [themes, setThemes] = useState('');
@@ -142,7 +189,7 @@ export const MondaySurveyModal: React.FC<MondaySurveyModalProps> = ({ participan
       responses: {
         sessionValue,
         eventOrganisation: organisation,
-        networkingUseful,
+        facilitatorsConnected,
         connectWithCompanies,
         returnLikelihood,
         suggestedThemes: themes.trim(),
@@ -159,7 +206,7 @@ export const MondaySurveyModal: React.FC<MondaySurveyModalProps> = ({ participan
   const reviewItems: { label: string; value: string }[] = [
     { label: STEP_TITLES[0], value: `${sessionValue} / 5` },
     { label: STEP_TITLES[1], value: `${organisation} / 5` },
-    { label: STEP_TITLES[2], value: networkingUseful || 'Not answered' },
+    { label: STEP_TITLES[2], value: facilitatorsConnected.length ? facilitatorsConnected.join(', ') : 'Not answered' },
     { label: STEP_TITLES[3], value: connectWithCompanies || 'Not answered' },
     { label: STEP_TITLES[4], value: `${returnLikelihood} / 5` },
     { label: STEP_TITLES[5], value: themes.trim() || '—' },
@@ -262,7 +309,7 @@ export const MondaySurveyModal: React.FC<MondaySurveyModalProps> = ({ participan
                   <p className="text-[11px] text-slate-500 -mt-1">
                     {step === 0 && 'Rate today\u2019s session overall.'}
                     {step === 1 && 'How well organised did the event feel?'}
-                    {step === 2 && 'Did you find the networking opportunities useful?'}
+                    {step === 2 && 'Which facilitators were you able to connect with after the event?'}
                     {step === 3 && 'Would you connect with the companies/organisations present after today?'}
                     {step === 4 && 'How likely are you to attend the career fair again in the future?'}
                     {step === 5 && 'What themes would you like to see at future career fairs?'}
@@ -286,10 +333,11 @@ export const MondaySurveyModal: React.FC<MondaySurveyModalProps> = ({ participan
                     />
                   )}
                   {step === 2 && (
-                    <ChoiceButtons
-                      value={networkingUseful}
-                      onChange={o => selectAndAdvance(() => setNetworkingUseful(o))}
-                      options={['Yes', 'No']}
+                    <MultiChoiceButtons
+                      value={facilitatorsConnected}
+                      onChange={setFacilitatorsConnected}
+                      options={FACILITATOR_OPTIONS}
+                      noneOption={NONE_OPTION}
                     />
                   )}
                   {step === 3 && (

@@ -42,7 +42,7 @@ const SURVEY_HEADERS = [
 
 const MONDAY_SURVEY_HEADERS = [
   "Event ID", "Response ID", "Participant ID", "Participant Name", "Submitted At",
-  "Session Rating", "Organisation", "Networking Useful", "Connect With Companies",
+  "Session Rating", "Organisation", "Facilitators Connected", "Connect With Companies",
   "Return Likelihood", "Suggested Themes", "Improvements"
 ];
 
@@ -55,7 +55,7 @@ const mondaySurveyRow = (s: PostEventSurvey): string[] => [
   s.eventId || "", s.id, s.participantId, s.participantName, s.submittedAt,
   String(s.responses.sessionValue ?? ''),
   String(s.responses.eventOrganisation ?? ''),
-  String(s.responses.networkingUseful ?? ''),
+  Array.isArray(s.responses.facilitatorsConnected) ? s.responses.facilitatorsConnected.join(', ') : '',
   String(s.responses.connectWithCompanies ?? ''),
   String(s.responses.returnLikelihood ?? ''),
   String(s.responses.suggestedThemes ?? ''),
@@ -211,7 +211,7 @@ function setupSpreadsheet() {
   if (mss.getLastRow() === 0) {
     mss.appendRow([
       "Event ID", "Response ID", "Participant ID", "Participant Name", "Submitted At",
-      "Session Rating", "Organisation", "Networking Useful", "Connect With Companies",
+      "Session Rating", "Organisation", "Facilitators Connected", "Connect With Companies",
       "Return Likelihood", "Suggested Themes", "Improvements"
     ]);
     mss.getRange(1, 1, 1, 12).setBackground("#1e293b").setFontColor("#ffffff").setFontWeight("bold");
@@ -319,7 +319,7 @@ function doPost(e) {
           s.eventId || "", s.id, s.participantId, s.participantName, s.submittedAt,
           s.responses && s.responses.sessionValue !== undefined ? s.responses.sessionValue : "",
           s.responses && s.responses.eventOrganisation !== undefined ? s.responses.eventOrganisation : "",
-          s.responses && s.responses.networkingUseful !== undefined ? s.responses.networkingUseful : "",
+          s.responses && Array.isArray(s.responses.facilitatorsConnected) ? s.responses.facilitatorsConnected.join(", ") : "",
           s.responses && s.responses.connectWithCompanies !== undefined ? s.responses.connectWithCompanies : "",
           s.responses && s.responses.returnLikelihood !== undefined ? s.responses.returnLikelihood : "",
           s.responses && s.responses.suggestedThemes ? s.responses.suggestedThemes : "",
@@ -375,12 +375,12 @@ function doPost(e) {
       if (payload.mondaySurveys) {
         syncSheet(ss, "Students Surveys", [
           "Event ID", "Response ID", "Participant ID", "Participant Name", "Submitted At",
-          "Session Rating", "Organisation", "Networking Useful", "Connect With Companies",
+          "Session Rating", "Organisation", "Facilitators Connected", "Connect With Companies",
           "Return Likelihood", "Suggested Themes", "Improvements"
         ], payload.mondaySurveys.map(s => [s.eventId || "", s.id, s.participantId, s.participantName, s.submittedAt,
           s.responses && s.responses.sessionValue !== undefined ? s.responses.sessionValue : "",
           s.responses && s.responses.eventOrganisation !== undefined ? s.responses.eventOrganisation : "",
-          s.responses && s.responses.networkingUseful !== undefined ? s.responses.networkingUseful : "",
+          s.responses && Array.isArray(s.responses.facilitatorsConnected) ? s.responses.facilitatorsConnected.join(", ") : "",
           s.responses && s.responses.connectWithCompanies !== undefined ? s.responses.connectWithCompanies : "",
           s.responses && s.responses.returnLikelihood !== undefined ? s.responses.returnLikelihood : "",
           s.responses && s.responses.suggestedThemes ? s.responses.suggestedThemes : "",
