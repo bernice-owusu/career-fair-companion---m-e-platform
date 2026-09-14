@@ -12,7 +12,51 @@ interface MondayRegistrationFormProps {
 const baseInputClass =
   'w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-md text-sm text-navy placeholder:text-slate-300 focus:outline-none focus:border-orange transition';
 
-const YEAR_OF_STUDY_OPTIONS = ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5', 'Year 6', 'Other'];
+const YEAR_OF_STUDY_OPTIONS = ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5', 'Year 6'];
+
+const CAREER_AWARENESS_LABELS: Record<number, string> = {
+  1: 'Very Low / Unaware',
+  2: 'Low',
+  3: 'Moderate',
+  4: 'High',
+  5: 'Very High / Well-Informed',
+};
+
+const CAREER_TRANSITION_CONFIDENCE_LABELS: Record<number, string> = {
+  1: 'Not Confident at all',
+  2: 'Slightly Confident',
+  3: 'Moderately Confident',
+  4: 'Confident',
+  5: 'Extremely Confident',
+};
+
+const RatingRow: React.FC<{
+  value: number | undefined;
+  onChange: (n: number) => void;
+  labels: Record<number, string>;
+}> = ({ value, onChange, labels }) => (
+  <div>
+    <div className="flex items-center justify-between gap-2">
+      {([1, 2, 3, 4, 5] as const).map(n => (
+        <button
+          type="button"
+          key={n}
+          onClick={() => onChange(n)}
+          className={`flex-1 py-2 rounded-md flex flex-col items-center gap-1 border transition ${
+            value === n
+              ? 'bg-orange/20 border-orange text-orange'
+              : 'bg-white border-slate-100 text-slate-300 hover:border-slate-300'
+          }`}
+        >
+          <span className="text-[10px] font-bold">{n}</span>
+        </button>
+      ))}
+    </div>
+    {value !== undefined && (
+      <p className="text-[11px] text-slate-500 mt-1.5 text-center">{labels[value]}</p>
+    )}
+  </div>
+);
 
 const FieldError: React.FC<{ field: string; errors: Record<string, string> }> = ({ field, errors }) =>
   errors[field] ? <p className="text-[11px] text-error font-semibold mt-1">{errors[field]}</p> : null;
@@ -26,6 +70,8 @@ export const MondayRegistrationForm: React.FC<MondayRegistrationFormProps> = ({ 
   const [email, setEmail] = useState('');
   const [institution, setInstitution] = useState('');
   const [yearOfStudy, setYearOfStudy] = useState('');
+  const [careerAwareness, setCareerAwareness] = useState<number | undefined>(undefined);
+  const [careerTransitionConfidence, setCareerTransitionConfidence] = useState<number | undefined>(undefined);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -53,6 +99,8 @@ export const MondayRegistrationForm: React.FC<MondayRegistrationFormProps> = ({ 
       email: email.trim().toLowerCase(),
       institution,
       yearOfStudy,
+      careerAwareness,
+      careerTransitionConfidence,
     });
   };
 
@@ -155,6 +203,30 @@ export const MondayRegistrationForm: React.FC<MondayRegistrationFormProps> = ({ 
             All pharmacy students are welcome.
           </p>
           <FieldError field="yearOfStudy" errors={errors} />
+        </div>
+
+        <div>
+          <label className="block text-xs font-bold uppercase tracking-wider text-navy mb-1.5">
+            How would you rate your current awareness of non-traditional (e.g. supply chain,
+            pharmacovigilance) and emerging career pathways for pharmacists?
+          </label>
+          <RatingRow
+            value={careerAwareness}
+            onChange={setCareerAwareness}
+            labels={CAREER_AWARENESS_LABELS}
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-bold uppercase tracking-wider text-navy mb-1.5">
+            How confident do you feel about navigating your career transition from training to
+            professional employment?
+          </label>
+          <RatingRow
+            value={careerTransitionConfidence}
+            onChange={setCareerTransitionConfidence}
+            labels={CAREER_TRANSITION_CONFIDENCE_LABELS}
+          />
         </div>
 
         <button

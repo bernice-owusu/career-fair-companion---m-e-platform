@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { X, Star, Sparkles, CheckCircle2, ArrowRight, MessageSquare, ThumbsUp } from 'lucide-react';
+import { X, Star, CheckCircle2, ArrowRight, ThumbsUp } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { Booth, ExitSurvey, Participant } from '../../types';
 import { StorageService } from '../../services/storageService';
+import { ACTIONABLE_NEXT_STEPS_OPTIONS } from '../../registrationOptions';
 
 interface ExitSurveyModalProps {
   participant: Participant;
@@ -11,31 +12,103 @@ interface ExitSurveyModalProps {
   onSuccess: (survey: ExitSurvey) => void;
 }
 
+const MultiChoiceButtons: React.FC<{
+  value: string[];
+  onChange: (next: string[]) => void;
+  options: string[];
+  maxSelections?: number;
+}> = ({ value, onChange, options, maxSelections }) => {
+  const toggle = (o: string) => {
+    if (value.includes(o)) {
+      onChange(value.filter(v => v !== o));
+      return;
+    }
+    if (maxSelections !== undefined && value.length >= maxSelections) return;
+    onChange([...value, o]);
+  };
+
+  const atCap = maxSelections !== undefined && value.length >= maxSelections;
+
+  return (
+    <div className="grid gap-2 pt-1">
+      {options.map(o => {
+        const selected = value.includes(o);
+        const disabled = !selected && atCap;
+        return (
+          <button
+            type="button"
+            key={o}
+            onClick={() => toggle(o)}
+            disabled={disabled}
+            aria-pressed={selected}
+            className={`w-full min-h-12 px-4 py-2.5 rounded-full text-sm font-bold border transition active:scale-95 ${
+              selected
+                ? 'bg-orange/20 border-orange text-orange'
+                : disabled
+                  ? 'bg-slate-50 border-slate-100 text-slate-300 cursor-not-allowed'
+                  : 'bg-white border-slate-100 text-slate-500 hover:border-slate-300'
+            }`}
+          >
+            {o}
+          </button>
+        );
+      })}
+    </div>
+  );
+};
+
 export const ExitSurveyModal: React.FC<ExitSurveyModalProps> = ({
   participant,
   booths,
   onClose,
   onSuccess,
 }) => {
-  const [overallRating, setOverallRating] = useState<number>(5);
-  const [confidenceRating, setConfidenceRating] = useState<number>(5);
+  const [overallRating, setOverallRating] = useState<number | undefined>(undefined);
+  const [confidenceRating, setConfidenceRating] = useState<number | undefined>(undefined);
+  const [careerAwareness, setCareerAwareness] = useState<number | undefined>(undefined);
   const [mostUsefulBoothId, setMostUsefulBoothId] = useState<string>(booths[0]?.id || '');
-  const [keyLearning, setKeyLearning] = useState('');
+  const [speakerEffectiveness, setSpeakerEffectiveness] = useState<number | undefined>(undefined);
+  const [careerAdviceActionability, setCareerAdviceActionability] = useState<number | undefined>(undefined);
+  const [facilitatorFeedback, setFacilitatorFeedback] = useState('');
+  const [actionableNextSteps, setActionableNextSteps] = useState<string[]>([]);
+  const [actionableNextStepsOther, setActionableNextStepsOther] = useState('');
   const [improvement, setImprovement] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [savedSurvey, setSavedSurvey] = useState<ExitSurvey | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (
+      overallRating === undefined ||
+      confidenceRating === undefined ||
+      careerAwareness === undefined ||
+      speakerEffectiveness === undefined ||
+      careerAdviceActionability === undefined
+    ) {
+      setValidationError('Please answer every required rating before submitting.');
+      return;
+    }
+    if (actionableNextSteps.includes('Other') && !actionableNextStepsOther.trim()) {
+      setValidationError('Please specify your answer for the next-steps question.');
+      return;
+    }
+    setValidationError(null);
     setIsSubmitting(true);
 
     const survey = StorageService.submitExitSurvey({
       participantId: participant.id,
       overallRating,
       confidenceRating,
+      careerAwareness,
       mostUsefulBoothId,
-      keyLearning: keyLearning.trim() || "Attending multiple hands-on booths enhanced my career path clarity.",
+      speakerEffectiveness,
+      careerAdviceActionability,
+      facilitatorFeedback: facilitatorFeedback.trim(),
+      actionableNextSteps,
+      actionableNextStepsOther: actionableNextStepsOther.trim(),
       improvement: improvement.trim() || "Great event overall!"
     });
 
@@ -119,12 +192,12 @@ export const ExitSurveyModal: React.FC<ExitSurveyModalProps> = ({
                       key={star}
                       onClick={() => setOverallRating(star)}
                       className={`flex-1 py-2 rounded-md flex flex-col items-center gap-1 border transition ${
-                        overallRating >= star
+                        overallRating !== undefined && overallRating >= star
                           ? 'bg-orange/20 border-orange text-orange'
                           : 'bg-white border-slate-100 text-slate-300 hover:border-slate-300'
                       }`}
                     >
-                      <Star className={`w-5 h-5 ${overallRating >= star ? 'fill-orange text-orange' : ''}`} />
+                      <Star className={`w-5 h-5 ${overallRating !== undefined && overallRating >= star ? 'fill-orange text-orange' : ''}`} />
                       <span className="text-[10px] font-bold">{star}</span>
                     </button>
                   ))}
@@ -135,10 +208,10 @@ export const ExitSurveyModal: React.FC<ExitSurveyModalProps> = ({
                 </div>
               </div>
 
-              {/* Question 2: Career Readiness Confidence */}
+              {/* Question 2: Career Transition Confidence */}
               <div className="bg-cream border border-slate-100 rounded-lg p-4 space-y-2">
                 <label className="block text-xs font-bold text-navy">
-                  2. How confident do you feel about your career readiness after today's event? <span className="text-error">*</span>
+                  2. How confident do you feel about navigating your career transition from training to professional employment? <span className="text-error">*</span>
                 </label>
                 <div className="flex items-center justify-between gap-2 pt-1">
                   {[1, 2, 3, 4, 5].map((level) => (
@@ -147,26 +220,53 @@ export const ExitSurveyModal: React.FC<ExitSurveyModalProps> = ({
                       key={level}
                       onClick={() => setConfidenceRating(level)}
                       className={`flex-1 py-2 rounded-md flex flex-col items-center gap-1 border transition ${
-                        confidenceRating >= level
+                        confidenceRating !== undefined && confidenceRating >= level
                           ? 'bg-orange/20 border-orange text-orange'
                           : 'bg-white border-slate-100 text-slate-300 hover:border-slate-300'
                       }`}
                     >
-                      <ThumbsUp className={`w-4 h-4 ${confidenceRating >= level ? 'text-orange' : ''}`} />
+                      <ThumbsUp className={`w-4 h-4 ${confidenceRating !== undefined && confidenceRating >= level ? 'text-orange' : ''}`} />
                       <span className="text-[10px] font-bold">{level}</span>
                     </button>
                   ))}
                 </div>
                 <div className="flex justify-between text-[10px] text-slate-300 px-1">
-                  <span>1 - Low Confidence</span>
-                  <span>5 - Very Confident</span>
+                  <span>1 - Not Confident at all</span>
+                  <span>5 - Extremely Confident</span>
                 </div>
               </div>
 
-              {/* Question 3: Most Useful Booth */}
+              {/* Question 3: Career Awareness */}
               <div className="bg-cream border border-slate-100 rounded-lg p-4 space-y-2">
                 <label className="block text-xs font-bold text-navy">
-                  3. Which booth did you find MOST useful today? <span className="text-error">*</span>
+                  3. How would you rate your current awareness of non-traditional (pharmacovigilance, supply chain) and emerging career pathways for pharmacists? <span className="text-error">*</span>
+                </label>
+                <div className="flex items-center justify-between gap-2 pt-1">
+                  {[1, 2, 3, 4, 5].map((level) => (
+                    <button
+                      type="button"
+                      key={level}
+                      onClick={() => setCareerAwareness(level)}
+                      className={`flex-1 py-2 rounded-md flex flex-col items-center gap-1 border transition ${
+                        careerAwareness !== undefined && careerAwareness >= level
+                          ? 'bg-orange/20 border-orange text-orange'
+                          : 'bg-white border-slate-100 text-slate-300 hover:border-slate-300'
+                      }`}
+                    >
+                      <span className="text-[10px] font-bold">{level}</span>
+                    </button>
+                  ))}
+                </div>
+                <div className="flex justify-between text-[10px] text-slate-300 px-1">
+                  <span>1 - Very Low / Unaware</span>
+                  <span>5 - Very High / Well-Informed</span>
+                </div>
+              </div>
+
+              {/* Question 4: Most Valuable Session */}
+              <div className="bg-cream border border-slate-100 rounded-lg p-4 space-y-2">
+                <label className="block text-xs font-bold text-navy">
+                  4. Which specific non-traditional session or track did you attend and find most valuable? <span className="text-error">*</span>
                 </label>
                 <select
                   value={mostUsefulBoothId}
@@ -181,24 +281,100 @@ export const ExitSurveyModal: React.FC<ExitSurveyModalProps> = ({
                 </select>
               </div>
 
-              {/* Question 4: Most Important Thing Learned */}
+              {/* Question 5: Speaker Effectiveness */}
               <div className="bg-cream border border-slate-100 rounded-lg p-4 space-y-2">
                 <label className="block text-xs font-bold text-navy">
-                  4. What is the most important thing you learned today?
+                  5. Rate how well the speaker communicated the realities and entry requirements of the specific non-traditional path. <span className="text-error">*</span>
+                </label>
+                <div className="flex items-center justify-between gap-2 pt-1">
+                  {[1, 2, 3, 4, 5].map((level) => (
+                    <button
+                      type="button"
+                      key={level}
+                      onClick={() => setSpeakerEffectiveness(level)}
+                      className={`flex-1 py-2 rounded-md flex flex-col items-center gap-1 border transition ${
+                        speakerEffectiveness !== undefined && speakerEffectiveness >= level
+                          ? 'bg-orange/20 border-orange text-orange'
+                          : 'bg-white border-slate-100 text-slate-300 hover:border-slate-300'
+                      }`}
+                    >
+                      <span className="text-[10px] font-bold">{level}</span>
+                    </button>
+                  ))}
+                </div>
+                <div className="flex justify-between text-[10px] text-slate-300 px-1">
+                  <span>1 - Poor</span>
+                  <span>5 - Excellent</span>
+                </div>
+              </div>
+
+              {/* Question 6: Career Advice Actionability */}
+              <div className="bg-cream border border-slate-100 rounded-lg p-4 space-y-2">
+                <label className="block text-xs font-bold text-navy">
+                  6. Rate how actionable the career advice and pathway insights were for your current career stage. <span className="text-error">*</span>
+                </label>
+                <div className="flex items-center justify-between gap-2 pt-1">
+                  {[1, 2, 3, 4, 5].map((level) => (
+                    <button
+                      type="button"
+                      key={level}
+                      onClick={() => setCareerAdviceActionability(level)}
+                      className={`flex-1 py-2 rounded-md flex flex-col items-center gap-1 border transition ${
+                        careerAdviceActionability !== undefined && careerAdviceActionability >= level
+                          ? 'bg-orange/20 border-orange text-orange'
+                          : 'bg-white border-slate-100 text-slate-300 hover:border-slate-300'
+                      }`}
+                    >
+                      <span className="text-[10px] font-bold">{level}</span>
+                    </button>
+                  ))}
+                </div>
+                <div className="flex justify-between text-[10px] text-slate-300 px-1">
+                  <span>1 - Not Actionable</span>
+                  <span>5 - Highly Actionable</span>
+                </div>
+              </div>
+
+              {/* Question 7: Facilitator Feedback */}
+              <div className="bg-cream border border-slate-100 rounded-lg p-4 space-y-2">
+                <label className="block text-xs font-bold text-navy">
+                  7. Any specific comments or feedback for the session facilitators?
                 </label>
                 <textarea
                   rows={2}
-                  placeholder="e.g. Using the STAR framework for interview answers..."
-                  value={keyLearning}
-                  onChange={(e) => setKeyLearning(e.target.value)}
+                  placeholder="Optional — share any feedback for the facilitators"
+                  value={facilitatorFeedback}
+                  onChange={(e) => setFacilitatorFeedback(e.target.value)}
                   className="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-md text-sm text-navy placeholder:text-slate-300 focus:outline-none focus:border-orange resize-none"
                 />
               </div>
 
-              {/* Question 5: Improvement Feedback */}
+              {/* Question 8: Actionable Next Steps */}
               <div className="bg-cream border border-slate-100 rounded-lg p-4 space-y-2">
                 <label className="block text-xs font-bold text-navy">
-                  5. What could we improve for future career fairs?
+                  8. What immediate action do you plan to take after today's event? (Select up to 2)
+                </label>
+                <MultiChoiceButtons
+                  value={actionableNextSteps}
+                  onChange={setActionableNextSteps}
+                  options={ACTIONABLE_NEXT_STEPS_OPTIONS}
+                  maxSelections={2}
+                />
+                {actionableNextSteps.includes('Other') && (
+                  <input
+                    type="text"
+                    placeholder="Please specify..."
+                    value={actionableNextStepsOther}
+                    onChange={(e) => setActionableNextStepsOther(e.target.value)}
+                    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-md text-sm text-navy placeholder:text-slate-300 focus:outline-none focus:border-orange"
+                  />
+                )}
+              </div>
+
+              {/* Question 9: Improvement Feedback */}
+              <div className="bg-cream border border-slate-100 rounded-lg p-4 space-y-2">
+                <label className="block text-xs font-bold text-navy">
+                  9. What could we improve for future career fairs?
                 </label>
                 <textarea
                   rows={2}
@@ -208,6 +384,10 @@ export const ExitSurveyModal: React.FC<ExitSurveyModalProps> = ({
                   className="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-md text-sm text-navy placeholder:text-slate-300 focus:outline-none focus:border-orange resize-none"
                 />
               </div>
+
+              {validationError && (
+                <p className="text-xs text-error font-semibold text-center">{validationError}</p>
+              )}
 
               {/* Submit CTA */}
               <button

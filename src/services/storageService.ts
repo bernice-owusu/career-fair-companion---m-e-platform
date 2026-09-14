@@ -638,6 +638,8 @@ export class StorageService {
       surname: sanitized.surname as string,
       institution: sanitized.institution as string,
       yearOfStudy: sanitized.yearOfStudy as string,
+      careerAwareness: sanitized.careerAwareness as number | undefined,
+      careerTransitionConfidence: sanitized.careerTransitionConfidence as number | undefined,
       phone: '',
       email: (sanitized.email as string).trim().toLowerCase(),
       registeredAt: new Date().toISOString(),
@@ -824,8 +826,13 @@ export class StorageService {
     participantId: string;
     overallRating: number;
     confidenceRating: number;
+    careerAwareness: number;
     mostUsefulBoothId: string;
-    keyLearning: string;
+    speakerEffectiveness: number;
+    careerAdviceActionability: number;
+    facilitatorFeedback: string;
+    actionableNextSteps: string[];
+    actionableNextStepsOther: string;
     improvement: string;
   }): ExitSurvey {
     const participant = this.getParticipants().find(p => p.id === data.participantId);
@@ -838,9 +845,14 @@ export class StorageService {
       participantName: participant?.fullName || "Participant",
       overallRating: data.overallRating,
       confidenceRating: data.confidenceRating,
+      careerAwareness: data.careerAwareness,
       mostUsefulBoothId: data.mostUsefulBoothId,
       mostUsefulBoothName: booth?.name || "General Session",
-      keyLearning: data.keyLearning.trim(),
+      speakerEffectiveness: data.speakerEffectiveness,
+      careerAdviceActionability: data.careerAdviceActionability,
+      facilitatorFeedback: data.facilitatorFeedback.trim(),
+      actionableNextSteps: data.actionableNextSteps,
+      actionableNextStepsOther: data.actionableNextStepsOther.trim(),
       improvement: data.improvement.trim(),
       submittedAt: new Date().toISOString()
     };

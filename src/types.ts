@@ -98,6 +98,14 @@ export interface Participant {
   attendedLastYear?: string; // Yes | No
   facilitatorQuestions?: string;
 
+  // Career Transition (Edition 3) — careerStage/careerChallenges are Friday-only;
+  // careerAwareness/careerTransitionConfidence are collected on both Monday and Friday
+  careerStage?: string;
+  careerAwareness?: number; // 1 (Very Low / Unaware) - 5 (Very High / Well-Informed)
+  careerTransitionConfidence?: number; // 1 (Not Confident at all) - 5 (Extremely Confident)
+  careerChallenges?: string[];
+  careerChallengesOther?: string;
+
   // @deprecated legacy fields from the pre-rebrand registration form (seeded demo data)
   educationLevel?: string;
   employmentStatus?: string;
@@ -123,6 +131,8 @@ export interface MondayRegistrationData {
   email: string;
   institution: string;
   yearOfStudy: string;
+  careerAwareness?: number; // 1 (Very Low / Unaware) - 5 (Very High / Well-Informed)
+  careerTransitionConfidence?: number; // 1 (Not Confident at all) - 5 (Extremely Confident)
 }
 
 // ---------------------------------------------------------------------------
@@ -171,10 +181,15 @@ export interface ExitSurvey {
   participantId: string;
   participantName: string;
   overallRating: number; // 1 to 5
-  confidenceRating: number; // 1 to 5
+  confidenceRating: number; // 1 to 5 — career transition confidence
+  careerAwareness: number; // 1 (Very Low / Unaware) - 5 (Very High / Well-Informed)
   mostUsefulBoothId: string;
-  mostUsefulBoothName: string;
-  keyLearning: string;
+  mostUsefulBoothName: string; // most valuable non-traditional session/track
+  speakerEffectiveness: number; // 1 (Poor) - 5 (Excellent)
+  careerAdviceActionability: number; // 1 (Not Actionable) - 5 (Highly Actionable)
+  facilitatorFeedback: string;
+  actionableNextSteps: string[]; // max 2 selections
+  actionableNextStepsOther: string;
   improvement: string;
   submittedAt: string;
 }

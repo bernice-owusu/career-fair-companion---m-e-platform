@@ -9,7 +9,8 @@ const PARTICIPANT_HEADERS = [
   "Ideal Career Path", "Ideal Career Path Other", "Career Fair Expectations", "Career Fair Expectations Other",
   "Career Tracks", "Skills Lab Resume Assistance", "Skills Lab Resume Assistance Other", "Resume Quality (1-5)",
   "CV Uploaded", "CV Link", "Interview Confidence (1-5)", "Mock Interview", "How Heard About Career Fair", "How Heard Other",
-  "Attended Last Year", "Facilitator Questions", "Institution", "Year of Study"
+  "Attended Last Year", "Facilitator Questions", "Institution", "Year of Study",
+  "Career Stage", "Career Awareness (1-5)", "Career Transition Confidence (1-5)", "Career Challenges", "Career Challenges Other"
 ];
 
 const participantRow = (p: Participant): string[] => [
@@ -22,7 +23,9 @@ const participantRow = (p: Participant): string[] => [
   (p.careerTracks || []).join(", "), p.skillsLabResumeAssistance || "", p.skillsLabResumeAssistanceOther || "",
   p.resumeQuality ? String(p.resumeQuality) : "", p.cvUploaded ? "Yes" : "No", p.cvLink || "", p.interviewConfidence ? String(p.interviewConfidence) : "",
   p.mockInterview || "", p.heardAboutCareerFair || "", p.heardAboutCareerFairOther || "",
-  p.attendedLastYear || "", p.facilitatorQuestions || "", p.institution || "", p.yearOfStudy || ""
+  p.attendedLastYear || "", p.facilitatorQuestions || "", p.institution || "", p.yearOfStudy || "",
+  p.careerStage || "", p.careerAwareness ? String(p.careerAwareness) : "", p.careerTransitionConfidence ? String(p.careerTransitionConfidence) : "",
+  (p.careerChallenges || []).join(", "), p.careerChallengesOther || ""
 ];
 
 const ATTENDANCE_HEADERS = [
@@ -36,19 +39,29 @@ const VISIT_HEADERS = [
 
 const SURVEY_HEADERS = [
   "Event ID", "Response ID", "Participant ID", "Participant Name", "Overall Rating (1-5)",
-  "Confidence Rating (1-5)", "Most Useful Booth", "Key Learning Highlight",
+  "Confidence Rating (1-5)", "Career Awareness (1-5)", "Most Valuable Session",
+  "Speaker Effectiveness (1-5)", "Career Advice Actionability (1-5)", "Facilitator Feedback",
+  "Actionable Next Steps", "Actionable Next Steps Other",
   "Improvement Suggestions", "Submitted At", "Survey Type"
 ];
 
 const MONDAY_SURVEY_HEADERS = [
   "Event ID", "Response ID", "Participant ID", "Participant Name", "Submitted At",
   "Session Rating", "Organisation", "Facilitators Connected", "Connect With Companies",
-  "Return Likelihood", "Suggested Themes", "Improvements"
+  "Return Likelihood", "Suggested Themes", "Improvements",
+  "Career Awareness (1-5)", "Career Transition Confidence (1-5)", "Actionable Next Steps", "Actionable Next Steps Other"
 ];
 
 const QUESTION_HEADERS = [
   "Event ID", "Question ID", "Participant ID", "Participant Name", "Question",
   "Status", "Answer", "Created At"
+];
+
+const surveyRow = (s: ExitSurvey): string[] => [
+  s.eventId || "", s.id, s.participantId, s.participantName, String(s.overallRating),
+  String(s.confidenceRating), String(s.careerAwareness), s.mostUsefulBoothName,
+  String(s.speakerEffectiveness), String(s.careerAdviceActionability), s.facilitatorFeedback,
+  s.actionableNextSteps.join(", "), s.actionableNextStepsOther, s.improvement, s.submittedAt, "Professionals"
 ];
 
 const mondaySurveyRow = (s: PostEventSurvey): string[] => [
@@ -59,7 +72,11 @@ const mondaySurveyRow = (s: PostEventSurvey): string[] => [
   String(s.responses.connectWithCompanies ?? ''),
   String(s.responses.returnLikelihood ?? ''),
   String(s.responses.suggestedThemes ?? ''),
-  String(s.responses.improvements ?? '')
+  String(s.responses.improvements ?? ''),
+  String(s.responses.careerAwareness ?? ''),
+  String(s.responses.careerTransitionConfidence ?? ''),
+  Array.isArray(s.responses.actionableNextSteps) ? s.responses.actionableNextSteps.join(', ') : '',
+  String(s.responses.actionableNextStepsOther ?? '')
 ];
 
 const questionRow = (q: NexusQuestion): string[] => [
@@ -89,7 +106,8 @@ const REGISTER_HEADERS = [
   "Ideal Career Path", "Ideal Career Path Other", "Career Fair Expectations", "Career Fair Expectations Other",
   "Career Tracks", "Skills Lab Resume Assistance", "Skills Lab Resume Assistance Other", "Resume Quality (1-5)",
   "CV Uploaded", "CV Link", "Interview Confidence (1-5)", "Mock Interview", "How Heard About Career Fair", "How Heard Other",
-  "Attended Last Year", "Facilitator Questions", "Institution", "Year of Study"
+  "Attended Last Year", "Facilitator Questions", "Institution", "Year of Study",
+  "Career Stage", "Career Awareness (1-5)", "Career Transition Confidence (1-5)", "Career Challenges", "Career Challenges Other"
 ];
 
 function participantRow(p) {
@@ -103,7 +121,9 @@ function participantRow(p) {
     (p.careerTracks || []).join(", "), p.skillsLabResumeAssistance || "", p.skillsLabResumeAssistanceOther || "",
     p.resumeQuality || "", p.cvUploaded === true ? "Yes" : "No", p.cvLink || "", p.interviewConfidence || "",
     p.mockInterview || "", p.heardAboutCareerFair || "", p.heardAboutCareerFairOther || "",
-    p.attendedLastYear || "", p.facilitatorQuestions || "", p.institution || "", p.yearOfStudy || ""
+    p.attendedLastYear || "", p.facilitatorQuestions || "", p.institution || "", p.yearOfStudy || "",
+    p.careerStage || "", p.careerAwareness || "", p.careerTransitionConfidence || "",
+    (p.careerChallenges || []).join(", "), p.careerChallengesOther || ""
   ];
 }
 
@@ -195,11 +215,13 @@ function setupSpreadsheet() {
   }
   if (sSheet.getLastRow() === 0) {
     sSheet.appendRow([
-      "Event ID", "Response ID", "Participant ID", "Participant Name", "Overall Rating (1-5)", 
-      "Confidence Rating (1-5)", "Most Useful Booth", "Key Learning Highlight", 
+      "Event ID", "Response ID", "Participant ID", "Participant Name", "Overall Rating (1-5)",
+      "Confidence Rating (1-5)", "Career Awareness (1-5)", "Most Valuable Session",
+      "Speaker Effectiveness (1-5)", "Career Advice Actionability (1-5)", "Facilitator Feedback",
+      "Actionable Next Steps", "Actionable Next Steps Other",
       "Improvement Suggestions", "Submitted At", "Survey Type"
     ]);
-    sSheet.getRange(1, 1, 1, 11).setBackground("#1e293b").setFontColor("#ffffff").setFontWeight("bold");
+    sSheet.getRange(1, 1, 1, 16).setBackground("#1e293b").setFontColor("#ffffff").setFontWeight("bold");
     sSheet.setFrozenRows(1);
   }
 
@@ -212,9 +234,10 @@ function setupSpreadsheet() {
     mss.appendRow([
       "Event ID", "Response ID", "Participant ID", "Participant Name", "Submitted At",
       "Session Rating", "Organisation", "Facilitators Connected", "Connect With Companies",
-      "Return Likelihood", "Suggested Themes", "Improvements"
+      "Return Likelihood", "Suggested Themes", "Improvements",
+      "Career Awareness (1-5)", "Career Transition Confidence (1-5)", "Actionable Next Steps", "Actionable Next Steps Other"
     ]);
-    mss.getRange(1, 1, 1, 12).setBackground("#1e293b").setFontColor("#ffffff").setFontWeight("bold");
+    mss.getRange(1, 1, 1, 16).setBackground("#1e293b").setFontColor("#ffffff").setFontWeight("bold");
     mss.setFrozenRows(1);
   }
 
@@ -323,14 +346,20 @@ function doPost(e) {
           s.responses && s.responses.connectWithCompanies !== undefined ? s.responses.connectWithCompanies : "",
           s.responses && s.responses.returnLikelihood !== undefined ? s.responses.returnLikelihood : "",
           s.responses && s.responses.suggestedThemes ? s.responses.suggestedThemes : "",
-          s.responses && s.responses.improvements ? s.responses.improvements : ""
+          s.responses && s.responses.improvements ? s.responses.improvements : "",
+          s.responses && s.responses.careerAwareness !== undefined ? s.responses.careerAwareness : "",
+          s.responses && s.responses.careerTransitionConfidence !== undefined ? s.responses.careerTransitionConfidence : "",
+          s.responses && Array.isArray(s.responses.actionableNextSteps) ? s.responses.actionableNextSteps.join(", ") : "",
+          s.responses && s.responses.actionableNextStepsOther ? s.responses.actionableNextStepsOther : ""
         ]);
         return createJsonResponse({ success: true, message: "Students' survey recorded successfully" });
       }
       const sheet = ss.getSheetByName("Surveys");
       sheet.appendRow([
         s.eventId || "", s.id, s.participantId, s.participantName, s.overallRating,
-        s.confidenceRating, s.mostUsefulBoothName, s.keyLearning,
+        s.confidenceRating, s.careerAwareness, s.mostUsefulBoothName,
+        s.speakerEffectiveness, s.careerAdviceActionability, s.facilitatorFeedback || "",
+        (s.actionableNextSteps || []).join(", "), s.actionableNextStepsOther || "",
         s.improvement, s.submittedAt, "Professionals"
       ]);
       return createJsonResponse({ success: true, message: "Survey recorded successfully" });
@@ -369,14 +398,25 @@ function doPost(e) {
       }
       if (payload.surveys) {
         syncSheet(ss, "Surveys", [
-          "Event ID", "Response ID", "Participant ID", "Participant Name", "Overall Rating (1-5)", "Confidence Rating (1-5)", "Most Useful Booth", "Key Learning Highlight", "Improvement Suggestions", "Submitted At", "Survey Type"
-        ], payload.surveys.map(s => [s.eventId || "", s.id, s.participantId, s.participantName, s.overallRating, s.confidenceRating, s.mostUsefulBoothName, s.keyLearning, s.improvement, s.submittedAt, "Professionals"]));
+          "Event ID", "Response ID", "Participant ID", "Participant Name", "Overall Rating (1-5)",
+          "Confidence Rating (1-5)", "Career Awareness (1-5)", "Most Valuable Session",
+          "Speaker Effectiveness (1-5)", "Career Advice Actionability (1-5)", "Facilitator Feedback",
+          "Actionable Next Steps", "Actionable Next Steps Other",
+          "Improvement Suggestions", "Submitted At", "Survey Type"
+        ], payload.surveys.map(s => [
+          s.eventId || "", s.id, s.participantId, s.participantName, s.overallRating,
+          s.confidenceRating, s.careerAwareness, s.mostUsefulBoothName,
+          s.speakerEffectiveness, s.careerAdviceActionability, s.facilitatorFeedback || "",
+          (s.actionableNextSteps || []).join(", "), s.actionableNextStepsOther || "",
+          s.improvement, s.submittedAt, "Professionals"
+        ]));
       }
       if (payload.mondaySurveys) {
         syncSheet(ss, "Students Surveys", [
           "Event ID", "Response ID", "Participant ID", "Participant Name", "Submitted At",
           "Session Rating", "Organisation", "Facilitators Connected", "Connect With Companies",
-          "Return Likelihood", "Suggested Themes", "Improvements"
+          "Return Likelihood", "Suggested Themes", "Improvements",
+          "Career Awareness (1-5)", "Career Transition Confidence (1-5)", "Actionable Next Steps", "Actionable Next Steps Other"
         ], payload.mondaySurveys.map(s => [s.eventId || "", s.id, s.participantId, s.participantName, s.submittedAt,
           s.responses && s.responses.sessionValue !== undefined ? s.responses.sessionValue : "",
           s.responses && s.responses.eventOrganisation !== undefined ? s.responses.eventOrganisation : "",
@@ -384,7 +424,11 @@ function doPost(e) {
           s.responses && s.responses.connectWithCompanies !== undefined ? s.responses.connectWithCompanies : "",
           s.responses && s.responses.returnLikelihood !== undefined ? s.responses.returnLikelihood : "",
           s.responses && s.responses.suggestedThemes ? s.responses.suggestedThemes : "",
-          s.responses && s.responses.improvements ? s.responses.improvements : ""]));
+          s.responses && s.responses.improvements ? s.responses.improvements : "",
+          s.responses && s.responses.careerAwareness !== undefined ? s.responses.careerAwareness : "",
+          s.responses && s.responses.careerTransitionConfidence !== undefined ? s.responses.careerTransitionConfidence : "",
+          s.responses && Array.isArray(s.responses.actionableNextSteps) ? s.responses.actionableNextSteps.join(", ") : "",
+          s.responses && s.responses.actionableNextStepsOther ? s.responses.actionableNextStepsOther : ""]));
       }
       if (payload.questions) {
         syncSheet(ss, "Questions", [
@@ -665,11 +709,7 @@ function createJsonResponse(data) {
 
     const surveyRows = [
       SURVEY_HEADERS,
-      ...surveys.map((s: ExitSurvey) => [
-        s.eventId || "", s.id, s.participantId, s.participantName, s.overallRating,
-        s.confidenceRating, s.mostUsefulBoothName, s.keyLearning,
-        s.improvement, s.submittedAt, "Professionals"
-      ])
+      ...surveys.map((s: ExitSurvey) => surveyRow(s))
     ];
 
     const mondaySurveyRows = [
@@ -711,12 +751,12 @@ function createJsonResponse(data) {
     const body = {
       valueInputOption: "USER_ENTERED",
       data: [
-        { range: "Participants!A1:AK", values: participantRows },
+        { range: "Participants!A1:AP", values: participantRows },
         { range: "Attendance!A1:G", values: attendanceRows },
         { range: "Booths!A1:G", values: boothRows },
         { range: "'Booth Visits'!A1:K", values: visitRows },
-        { range: "Surveys!A1:K", values: surveyRows },
-        { range: "'Students Surveys'!A1:L", values: mondaySurveyRows },
+        { range: "Surveys!A1:P", values: surveyRows },
+        { range: "'Students Surveys'!A1:P", values: mondaySurveyRows },
         { range: "Questions!A1:H", values: questionRows },
         { range: "'M&E Summary'!A1:C", values: summaryRows }
       ]
@@ -775,8 +815,8 @@ function createJsonResponse(data) {
       ...visits.map(v => [v.eventId || "", v.id, v.participantId, v.participantName, v.boothName, v.facilitator, v.boothCode, v.reflection, v.timestamp]),
       [],
       ["DATASET: EXIT SURVEYS"],
-      ["Event ID", "Response ID", "Participant ID", "Overall Rating", "Confidence Rating", "Most Useful Booth", "Key Learning", "Improvement", "Submitted At"],
-      ...surveys.map(s => [s.eventId || "", s.id, s.participantId, s.overallRating.toString(), s.confidenceRating.toString(), s.mostUsefulBoothName, s.keyLearning, s.improvement, s.submittedAt]),
+      SURVEY_HEADERS,
+      ...surveys.map(s => surveyRow(s)),
       [],
       ["DATASET: STUDENTS' SURVEYS"],
       MONDAY_SURVEY_HEADERS,

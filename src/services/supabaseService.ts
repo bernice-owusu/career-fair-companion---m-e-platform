@@ -50,6 +50,11 @@ export const SupabaseService = {
       heard_about_career_fair_other: participant.heardAboutCareerFairOther ?? null,
       attended_last_year: participant.attendedLastYear ?? null,
       facilitator_questions: participant.facilitatorQuestions ?? null,
+      career_stage: participant.careerStage ?? null,
+      career_awareness: participant.careerAwareness ?? null,
+      career_transition_confidence: participant.careerTransitionConfidence ?? null,
+      career_challenges: participant.careerChallenges ?? null,
+      career_challenges_other: participant.careerChallengesOther ?? null,
       // utm_source/medium/campaign intentionally omitted — column exists
       // (nullable) for Phase 5, no capture/passthrough wired yet.
     });

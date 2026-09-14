@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { X, Star, CheckCircle2, ArrowRight, ArrowLeft, Send, Pencil } from 'lucide-react';
 import { Participant, PostEventSurvey } from '../../types';
 import { StorageService } from '../../services/storageService';
+import { ACTIONABLE_NEXT_STEPS_OPTIONS } from '../../registrationOptions';
 
 interface MondaySurveyModalProps {
   participant: Participant;
@@ -9,17 +10,22 @@ interface MondaySurveyModalProps {
   onSuccess: (survey: PostEventSurvey) => void;
 }
 
-const QUESTION_COUNT = 7;
-const STEP_QUESTION_IDS = ['sessionValue', 'organisation', 'facilitatorsConnected', 'connectWithCompanies', 'returnLikelihood', 'themes', 'improvements'] as const;
+const QUESTION_COUNT = 10;
+const STEP_QUESTION_IDS = ['sessionValue', 'organisation', 'facilitatorsConnected', 'connectWithCompanies', 'returnLikelihood', 'careerAwareness', 'careerTransitionConfidence', 'actionableNextSteps', 'themes', 'improvements'] as const;
 const STEP_TITLES = [
   'Today\u2019s session',
   'Event organisation',
   'Facilitators connected',
   'Connect with companies?',
   'Attend again?',
+  'Career awareness',
+  'Career confidence',
+  'Next steps',
   'Future themes',
   'Improvements',
 ];
+const RATING_STEPS = [0, 1, 4, 5, 6];
+const ACTIONABLE_STEP = 7;
 
 const FACILITATOR_OPTIONS = [
   'Pharm. Eunice Baiden Laryea',
@@ -29,7 +35,7 @@ const FACILITATOR_OPTIONS = [
 const NONE_OPTION = 'None';
 
 const StarRating: React.FC<{
-  value: number;
+  value: number | undefined;
   onChange: (n: number) => void;
   startLabel: string;
   endLabel: string;
@@ -44,12 +50,12 @@ const StarRating: React.FC<{
           aria-pressed={value === n}
           aria-label={`${n} star${n > 1 ? 's' : ''}`}
           className={`flex-1 min-h-14 rounded-md flex flex-col items-center justify-center gap-1 border transition active:scale-95 ${
-            value >= n
+            value !== undefined && value >= n
               ? 'bg-orange/20 border-orange text-orange'
               : 'bg-white border-slate-100 text-slate-300 hover:border-slate-300'
           }`}
         >
-          <Star className={`w-5 h-5 ${value >= n ? 'fill-orange text-orange' : ''}`} />
+          <Star className={`w-5 h-5 ${value !== undefined && value >= n ? 'fill-orange text-orange' : ''}`} />
           <span className="text-[10px] font-bold">{n}</span>
         </button>
       ))}
@@ -89,38 +95,52 @@ const MultiChoiceButtons: React.FC<{
   value: string[];
   onChange: (next: string[]) => void;
   options: string[];
-  noneOption: string;
-}> = ({ value, onChange, options, noneOption }) => {
+  noneOption?: string;
+  maxSelections?: number;
+}> = ({ value, onChange, options, noneOption, maxSelections }) => {
+  const withoutNone = (v: string[]) => (noneOption ? v.filter(x => x !== noneOption) : v);
+
   const toggle = (o: string) => {
-    if (o === noneOption) {
+    if (noneOption && o === noneOption) {
       onChange(value.includes(noneOption) ? [] : [noneOption]);
       return;
     }
-    const withoutNone = value.filter(v => v !== noneOption);
-    onChange(
-      withoutNone.includes(o)
-        ? withoutNone.filter(v => v !== o)
-        : [...withoutNone, o]
-    );
+    const rest = withoutNone(value);
+    if (rest.includes(o)) {
+      onChange(rest.filter(v => v !== o));
+      return;
+    }
+    if (maxSelections !== undefined && rest.length >= maxSelections) return;
+    onChange([...rest, o]);
   };
+
+  const allOptions = noneOption ? [...options, noneOption] : options;
+  const atCap = maxSelections !== undefined && withoutNone(value).length >= maxSelections;
 
   return (
     <div className="grid gap-2 pt-1">
-      {[...options, noneOption].map(o => (
-        <button
-          type="button"
-          key={o}
-          onClick={() => toggle(o)}
-          aria-pressed={value.includes(o)}
-          className={`w-full min-h-12 px-4 py-2.5 rounded-full text-sm font-bold border transition active:scale-95 ${
-            value.includes(o)
-              ? 'bg-orange/20 border-orange text-orange'
-              : 'bg-white border-slate-100 text-slate-500 hover:border-slate-300'
-          }`}
-        >
-          {o}
-        </button>
-      ))}
+      {allOptions.map(o => {
+        const selected = value.includes(o);
+        const disabled = !selected && atCap;
+        return (
+          <button
+            type="button"
+            key={o}
+            onClick={() => toggle(o)}
+            disabled={disabled}
+            aria-pressed={selected}
+            className={`w-full min-h-12 px-4 py-2.5 rounded-full text-sm font-bold border transition active:scale-95 ${
+              selected
+                ? 'bg-orange/20 border-orange text-orange'
+                : disabled
+                  ? 'bg-slate-50 border-slate-100 text-slate-300 cursor-not-allowed'
+                  : 'bg-white border-slate-100 text-slate-500 hover:border-slate-300'
+            }`}
+          >
+            {o}
+          </button>
+        );
+      })}
     </div>
   );
 };
@@ -141,16 +161,21 @@ const TextQuestion: React.FC<{
 
 export const MondaySurveyModal: React.FC<MondaySurveyModalProps> = ({ participant, onClose, onSuccess }) => {
   const [step, setStep] = useState(0);
-  const [sessionValue, setSessionValue] = useState(5);
-  const [organisation, setOrganisation] = useState(5);
+  const [sessionValue, setSessionValue] = useState<number | undefined>(undefined);
+  const [organisation, setOrganisation] = useState<number | undefined>(undefined);
   const [facilitatorsConnected, setFacilitatorsConnected] = useState<string[]>([]);
   const [connectWithCompanies, setConnectWithCompanies] = useState('');
-  const [returnLikelihood, setReturnLikelihood] = useState(5);
+  const [returnLikelihood, setReturnLikelihood] = useState<number | undefined>(undefined);
+  const [careerAwareness, setCareerAwareness] = useState<number | undefined>(undefined);
+  const [careerTransitionConfidence, setCareerTransitionConfidence] = useState<number | undefined>(undefined);
+  const [actionableNextSteps, setActionableNextSteps] = useState<string[]>([]);
+  const [actionableNextStepsOther, setActionableNextStepsOther] = useState('');
   const [themes, setThemes] = useState('');
   const [improvements, setImprovements] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [savedSurvey, setSavedSurvey] = useState<PostEventSurvey | null>(null);
+  const [blockedStep, setBlockedStep] = useState<number | null>(null);
 
   const isReviewStep = step === QUESTION_COUNT;
   const bodyRef = useRef<HTMLDivElement>(null);
@@ -159,8 +184,31 @@ export const MondaySurveyModal: React.FC<MondaySurveyModalProps> = ({ participan
 
   const scrollTop = () => bodyRef.current?.scrollTo({ top: 0 });
 
+  const ratingValueForStep = (s: number): number | undefined => {
+    if (s === 0) return sessionValue;
+    if (s === 1) return organisation;
+    if (s === 4) return returnLikelihood;
+    if (s === 5) return careerAwareness;
+    if (s === 6) return careerTransitionConfidence;
+    return undefined;
+  };
+
+  const blockedMessage = (s: number): string | null => {
+    if (RATING_STEPS.includes(s) && ratingValueForStep(s) === undefined) {
+      return 'Please select a rating to continue.';
+    }
+    if (s === ACTIONABLE_STEP && actionableNextSteps.includes('Other') && !actionableNextStepsOther.trim()) {
+      return 'Please specify your answer.';
+    }
+    return null;
+  };
+
   const goNext = () => {
     if (isMoving || isReviewStep) return;
+    if (blockedMessage(step)) {
+      setBlockedStep(step);
+      return;
+    }
     setIsMoving(true);
     window.clearTimeout(advanceTimer.current);
     setStep(s => Math.min(s + 1, QUESTION_COUNT));
@@ -192,6 +240,10 @@ export const MondaySurveyModal: React.FC<MondaySurveyModalProps> = ({ participan
         facilitatorsConnected,
         connectWithCompanies,
         returnLikelihood,
+        careerAwareness,
+        careerTransitionConfidence,
+        actionableNextSteps,
+        actionableNextStepsOther,
         suggestedThemes: themes.trim(),
         improvements: improvements.trim(),
       },
@@ -204,13 +256,16 @@ export const MondaySurveyModal: React.FC<MondaySurveyModalProps> = ({ participan
   const progress = Math.round(((step) / QUESTION_COUNT) * 100);
 
   const reviewItems: { label: string; value: string }[] = [
-    { label: STEP_TITLES[0], value: `${sessionValue} / 5` },
-    { label: STEP_TITLES[1], value: `${organisation} / 5` },
+    { label: STEP_TITLES[0], value: sessionValue !== undefined ? `${sessionValue} / 5` : 'Not answered' },
+    { label: STEP_TITLES[1], value: organisation !== undefined ? `${organisation} / 5` : 'Not answered' },
     { label: STEP_TITLES[2], value: facilitatorsConnected.length ? facilitatorsConnected.join(', ') : 'Not answered' },
     { label: STEP_TITLES[3], value: connectWithCompanies || 'Not answered' },
-    { label: STEP_TITLES[4], value: `${returnLikelihood} / 5` },
-    { label: STEP_TITLES[5], value: themes.trim() || '—' },
-    { label: STEP_TITLES[6], value: improvements.trim() || '—' },
+    { label: STEP_TITLES[4], value: returnLikelihood !== undefined ? `${returnLikelihood} / 5` : 'Not answered' },
+    { label: STEP_TITLES[5], value: careerAwareness !== undefined ? `${careerAwareness} / 5` : 'Not answered' },
+    { label: STEP_TITLES[6], value: careerTransitionConfidence !== undefined ? `${careerTransitionConfidence} / 5` : 'Not answered' },
+    { label: STEP_TITLES[7], value: actionableNextSteps.length ? actionableNextSteps.join(', ') : 'Not answered' },
+    { label: STEP_TITLES[8], value: themes.trim() || '—' },
+    { label: STEP_TITLES[9], value: improvements.trim() || '—' },
   ];
 
   return (
@@ -304,7 +359,7 @@ export const MondaySurveyModal: React.FC<MondaySurveyModalProps> = ({ participan
                 <div key={step} className="bg-cream border border-slate-100 rounded-lg p-4 space-y-2 animate-fadeIn">
                   <label className="block text-sm font-bold text-navy">
                     {step + 1}. {STEP_TITLES[step]}
-                    {step < 5 && <span className="text-error"> *</span>}
+                    {step < 7 && <span className="text-error"> *</span>}
                   </label>
                   <p className="text-[11px] text-slate-500 -mt-1">
                     {step === 0 && 'Rate today\u2019s session overall.'}
@@ -312,8 +367,11 @@ export const MondaySurveyModal: React.FC<MondaySurveyModalProps> = ({ participan
                     {step === 2 && 'Which facilitators were you able to connect with after the event?'}
                     {step === 3 && 'Would you connect with the companies/organisations present after today?'}
                     {step === 4 && 'How likely are you to attend the career fair again in the future?'}
-                    {step === 5 && 'What themes would you like to see at future career fairs?'}
-                    {step === 6 && 'What improvements would you recommend for future events?'}
+                    {step === 5 && 'How would you rate your current awareness of non-traditional and emerging career pathways for pharmacists?'}
+                    {step === 6 && 'How confident do you feel about navigating your career transition from training to professional employment?'}
+                    {step === 7 && 'What immediate action do you plan to take after today\u2019s event? (Select up to 2)'}
+                    {step === 8 && 'What themes would you like to see at future career fairs?'}
+                    {step === 9 && 'What improvements would you recommend for future events?'}
                   </p>
 
                   {step === 0 && (
@@ -356,18 +414,56 @@ export const MondaySurveyModal: React.FC<MondaySurveyModalProps> = ({ participan
                     />
                   )}
                   {step === 5 && (
+                    <StarRating
+                      value={careerAwareness}
+                      onChange={n => selectAndAdvance(() => setCareerAwareness(n))}
+                      startLabel="1 - Very Low / Unaware"
+                      endLabel="5 - Very High / Well-Informed"
+                    />
+                  )}
+                  {step === 6 && (
+                    <StarRating
+                      value={careerTransitionConfidence}
+                      onChange={n => selectAndAdvance(() => setCareerTransitionConfidence(n))}
+                      startLabel="1 - Not Confident at all"
+                      endLabel="5 - Extremely Confident"
+                    />
+                  )}
+                  {step === 7 && (
+                    <>
+                      <MultiChoiceButtons
+                        value={actionableNextSteps}
+                        onChange={setActionableNextSteps}
+                        options={ACTIONABLE_NEXT_STEPS_OPTIONS}
+                        maxSelections={2}
+                      />
+                      {actionableNextSteps.includes('Other') && (
+                        <div className="pt-2">
+                          <TextQuestion
+                            value={actionableNextStepsOther}
+                            onChange={setActionableNextStepsOther}
+                            placeholder="Please specify..."
+                          />
+                        </div>
+                      )}
+                    </>
+                  )}
+                  {step === 8 && (
                     <TextQuestion
                       value={themes}
                       onChange={setThemes}
                       placeholder="e.g. More hands-on skills workshops, internships spotlights..."
                     />
                   )}
-                  {step === 6 && (
+                  {step === 9 && (
                     <TextQuestion
                       value={improvements}
                       onChange={setImprovements}
                       placeholder="e.g. Longer breaks between talks..."
                     />
+                  )}
+                  {blockedStep === step && blockedMessage(step) && (
+                    <p className="text-[11px] text-error font-semibold pt-1">{blockedMessage(step)}</p>
                   )}
                 </div>
               ) : (

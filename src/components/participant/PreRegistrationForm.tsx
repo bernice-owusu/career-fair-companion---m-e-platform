@@ -19,6 +19,10 @@ import {
   HOW_HEARD_OPTIONS,
   RESUME_QUALITY_LABELS,
   INTERVIEW_CONFIDENCE_LABELS,
+  CAREER_STAGE_OPTIONS,
+  CAREER_CHALLENGES_OPTIONS,
+  CAREER_AWARENESS_LABELS,
+  CAREER_TRANSITION_CONFIDENCE_LABELS,
 } from "../../registrationOptions";
 
 interface PreRegistrationFormProps {
@@ -47,6 +51,9 @@ const STEP_FIELDS: string[][] = [
     "phone",
     "psghRegistrationNumber",
     "currentJobTitle",
+    "careerStage",
+    "careerChallenges",
+    "careerChallengesOther",
   ],
   ["currentAreaOfPractice", "currentAreaOther", "regionOfResidence"],
   [
@@ -129,6 +136,11 @@ export const PreRegistrationForm: React.FC<PreRegistrationFormProps> = ({
     psghRegistrationNumber: "",
     highestEducation: "",
     currentJobTitle: "",
+    careerStage: "",
+    careerAwareness: undefined,
+    careerTransitionConfidence: undefined,
+    careerChallenges: [],
+    careerChallengesOther: "",
     currentAreaOfPractice: "",
     currentAreaOther: "",
     regionOfResidence: "",
@@ -166,7 +178,7 @@ export const PreRegistrationForm: React.FC<PreRegistrationFormProps> = ({
   };
 
   const toggleMulti = (
-    field: "careerFairExpectations" | "careerTracks",
+    field: "careerFairExpectations" | "careerTracks" | "careerChallenges",
     value: string,
   ) => {
     const current = form[field] || [];
@@ -211,6 +223,13 @@ export const PreRegistrationForm: React.FC<PreRegistrationFormProps> = ({
     }
     if (!form.currentJobTitle?.trim())
       nextErrors.currentJobTitle = REQUIRED_MSG;
+    if (!form.careerStage?.trim()) nextErrors.careerStage = REQUIRED_MSG;
+    if (
+      (form.careerChallenges || []).includes("Other") &&
+      !form.careerChallengesOther?.trim()
+    ) {
+      nextErrors.careerChallengesOther = OTHER_MSG;
+    }
 
     if (
       form.currentAreaOfPractice === "Other" &&
@@ -470,6 +489,122 @@ export const PreRegistrationForm: React.FC<PreRegistrationFormProps> = ({
                 />
                 {renderFieldError("currentJobTitle")}
               </div>
+
+              <div>
+                <Label req>Which best describes your current career stage?</Label>
+                <select
+                  value={form.careerStage}
+                  onChange={(e) => update("careerStage", e.target.value)}
+                  className={baseInputClass}
+                >
+                  <option value="">Select...</option>
+                  {CAREER_STAGE_OPTIONS.map((o) => (
+                    <option key={o} value={o}>
+                      {o}
+                    </option>
+                  ))}
+                </select>
+                {renderFieldError("careerStage")}
+              </div>
+
+              <div>
+                <Label>
+                  How would you rate your current awareness of non-traditional
+                  (e.g. supply chain, pharmacovigilance) and emerging career
+                  pathways for pharmacists?
+                </Label>
+                <div className="flex items-center justify-between gap-2">
+                  {([1, 2, 3, 4, 5] as const).map((n) => (
+                    <button
+                      type="button"
+                      key={n}
+                      onClick={() => update("careerAwareness", n)}
+                      className={`flex-1 py-2 rounded-md flex flex-col items-center gap-1 border transition ${
+                        form.careerAwareness === n
+                          ? "bg-orange/20 border-orange text-orange"
+                          : "bg-white border-slate-100 text-slate-300 hover:border-slate-300"
+                      }`}
+                    >
+                      <span className="text-[10px] font-bold">{n}</span>
+                    </button>
+                  ))}
+                </div>
+                {form.careerAwareness && (
+                  <p className="text-[11px] text-slate-500 mt-1.5 text-center">
+                    {CAREER_AWARENESS_LABELS[form.careerAwareness]}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <Label>
+                  How confident do you feel about navigating your career
+                  transition from training to professional employment?
+                </Label>
+                <div className="flex items-center justify-between gap-2">
+                  {([1, 2, 3, 4, 5] as const).map((n) => (
+                    <button
+                      type="button"
+                      key={n}
+                      onClick={() => update("careerTransitionConfidence", n)}
+                      className={`flex-1 py-2 rounded-md flex flex-col items-center gap-1 border transition ${
+                        form.careerTransitionConfidence === n
+                          ? "bg-orange/20 border-orange text-orange"
+                          : "bg-white border-slate-100 text-slate-300 hover:border-slate-300"
+                      }`}
+                    >
+                      <span className="text-[10px] font-bold">{n}</span>
+                    </button>
+                  ))}
+                </div>
+                {form.careerTransitionConfidence && (
+                  <p className="text-[11px] text-slate-500 mt-1.5 text-center">
+                    {CAREER_TRANSITION_CONFIDENCE_LABELS[form.careerTransitionConfidence]}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <Label>
+                  What are your biggest challenges or hurdles in transitioning
+                  into your desired pharmacy career? (Select all that apply)
+                </Label>
+                <div className="space-y-2">
+                  {CAREER_CHALLENGES_OPTIONS.map((o) => {
+                    const selected = (form.careerChallenges || []).includes(o);
+                    return (
+                      <button
+                        type="button"
+                        key={o}
+                        onClick={() => toggleMulti("careerChallenges", o)}
+                        className={`${selectionClass(selected)} w-full`}
+                      >
+                        <span className="flex-1 text-xs sm:text-sm font-semibold">
+                          {o}
+                        </span>
+                        {selected && (
+                          <CheckCircle2 className="w-4 h-4 text-orange" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+                {(form.careerChallenges || []).includes("Other") && (
+                  <div className="mt-2.5 bg-cream border border-slate-100 rounded-md p-3.5 space-y-1.5 animate-fadeIn">
+                    <Label req>Please specify.</Label>
+                    <input
+                      type="text"
+                      placeholder="Describe your biggest challenge"
+                      value={form.careerChallengesOther}
+                      onChange={(e) =>
+                        update("careerChallengesOther", e.target.value)
+                      }
+                      className={baseInputClass}
+                    />
+                    {renderFieldError("careerChallengesOther")}
+                  </div>
+                )}
+              </div>
             </div>
           </Section>
         )}
@@ -637,6 +772,12 @@ export const PreRegistrationForm: React.FC<PreRegistrationFormProps> = ({
             title="Career Track Interest"
             subtitle="Select all the career tracks you are interested in (12 available)"
           >
+            <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">
+              The Nexus Career Fair brings together pharmacy professionals from
+              diverse career paths — from pharmacovigilance and supply chain to
+              health-tech, regulatory affairs, and academia. Select the
+              sessions that match your interests and career goals.
+            </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {CAREER_TRACK_OPTIONS.map((t) => {
                 const selected = (form.careerTracks || []).includes(t);

@@ -1097,12 +1097,25 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     const s = surveys.find(surv => surv.participantId === selectedParticipantDetail.id)!;
                     return (
                       <div className="p-3.5 bg-navy/70 rounded-xl border border-mist/15 space-y-2">
-                        <div className="flex gap-4">
+                        <div className="flex gap-4 flex-wrap">
                           <span>Overall Rating: <strong>{s.overallRating} / 5 ⭐</strong></span>
-                          <span>Confidence: <strong>{s.confidenceRating} / 5</strong></span>
+                          <span>Career Confidence: <strong>{s.confidenceRating} / 5</strong></span>
+                          <span>Career Awareness: <strong>{s.careerAwareness} / 5</strong></span>
                         </div>
-                        <p>Most Useful Booth: <strong>{s.mostUsefulBoothName}</strong></p>
-                        <p className="text-mist/80">Key Learning: <span className="italic">{s.keyLearning}</span></p>
+                        <p>Most Valuable Session: <strong>{s.mostUsefulBoothName}</strong></p>
+                        <div className="flex gap-4 flex-wrap">
+                          <span>Speaker Effectiveness: <strong>{s.speakerEffectiveness} / 5</strong></span>
+                          <span>Advice Actionability: <strong>{s.careerAdviceActionability} / 5</strong></span>
+                        </div>
+                        {s.facilitatorFeedback && (
+                          <p className="text-mist/80">Facilitator Feedback: <span className="italic">{s.facilitatorFeedback}</span></p>
+                        )}
+                        <p className="text-mist/80">
+                          Actionable Next Steps: <span className="italic">
+                            {s.actionableNextSteps.length ? s.actionableNextSteps.join(', ') : 'None'}
+                            {s.actionableNextSteps.includes('Other') && s.actionableNextStepsOther ? ` (${s.actionableNextStepsOther})` : ''}
+                          </span>
+                        </p>
                         <p className="text-mist/80">Improvement Suggestion: <span className="italic">{s.improvement}</span></p>
                       </div>
                     );
@@ -1424,7 +1437,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
             {/* Confidence Card */}
             <div className="bg-navy/90 border border-mist/15 rounded-3xl p-5 space-y-2 shadow-xl text-center">
-              <span className="text-[11px] font-bold uppercase text-orange">Career Readiness Confidence</span>
+              <span className="text-[11px] font-bold uppercase text-orange">Career Transition Confidence</span>
               <p className="text-3xl sm:text-4xl font-black text-orange font-mono">
                 {surveys.length > 0
                   ? (surveys.reduce((acc, s) => acc + s.confidenceRating, 0) / surveys.length).toFixed(1)
@@ -1443,12 +1456,45 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </p>
               <span className="text-xs text-mist/60">{surveys.length} of {metrics.totalAttended} attendees</span>
             </div>
+
+            {/* Career Awareness Card */}
+            <div className="bg-navy/90 border border-mist/15 rounded-3xl p-5 space-y-2 shadow-xl text-center">
+              <span className="text-[11px] font-bold uppercase text-orange">Career Pathway Awareness</span>
+              <p className="text-3xl sm:text-4xl font-black text-orange font-mono">
+                {surveys.length > 0
+                  ? (surveys.reduce((acc, s) => acc + s.careerAwareness, 0) / surveys.length).toFixed(1)
+                  : '0.0'} <span className="text-lg font-sans">/ 5.0</span>
+              </p>
+              <span className="text-xs text-mist/60">Non-traditional pathway awareness</span>
+            </div>
+
+            {/* Speaker Effectiveness Card */}
+            <div className="bg-navy/90 border border-mist/15 rounded-3xl p-5 space-y-2 shadow-xl text-center">
+              <span className="text-[11px] font-bold uppercase text-orange">Speaker Effectiveness</span>
+              <p className="text-3xl sm:text-4xl font-black text-orange font-mono">
+                {surveys.length > 0
+                  ? (surveys.reduce((acc, s) => acc + s.speakerEffectiveness, 0) / surveys.length).toFixed(1)
+                  : '0.0'} <span className="text-lg font-sans">/ 5.0</span>
+              </p>
+              <span className="text-xs text-mist/60">Communicated path realities well</span>
+            </div>
+
+            {/* Career Advice Actionability Card */}
+            <div className="bg-navy/90 border border-mist/15 rounded-3xl p-5 space-y-2 shadow-xl text-center">
+              <span className="text-[11px] font-bold uppercase text-orange">Advice Actionability</span>
+              <p className="text-3xl sm:text-4xl font-black text-orange font-mono">
+                {surveys.length > 0
+                  ? (surveys.reduce((acc, s) => acc + s.careerAdviceActionability, 0) / surveys.length).toFixed(1)
+                  : '0.0'} <span className="text-lg font-sans">/ 5.0</span>
+              </p>
+              <span className="text-xs text-mist/60">Actionable for current career stage</span>
+            </div>
           </div>
 
           {/* Qualitative Feedback Cards */}
           <div className="space-y-3">
             <h3 className="text-sm font-bold uppercase tracking-wider text-mist/80">
-              Verbatim Participant Learning Highlights & Improvement Notes
+              Verbatim Participant Next Steps & Improvement Notes
             </h3>
 
             {surveys.length === 0 ? (
@@ -1465,9 +1511,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     </div>
 
                     <div className="bg-navy/70 p-3 rounded-xl border border-mist/15 text-xs space-y-1.5">
-                      <span className="text-[10px] font-bold text-orange uppercase block">Most Important Learning:</span>
-                      <p className="text-mist/80 italic">"{s.keyLearning}"</p>
+                      <span className="text-[10px] font-bold text-orange uppercase block">Actionable Next Steps:</span>
+                      <p className="text-mist/80 italic">
+                        "{s.actionableNextSteps.length ? s.actionableNextSteps.join(', ') : 'None'}
+                        {s.actionableNextSteps.includes('Other') && s.actionableNextStepsOther ? ` (${s.actionableNextStepsOther})` : ''}"
+                      </p>
                     </div>
+
+                    {s.facilitatorFeedback && (
+                      <div className="bg-navy/70 p-3 rounded-xl border border-mist/15 text-xs space-y-1.5">
+                        <span className="text-[10px] font-bold text-mist/60 uppercase block">Facilitator Feedback:</span>
+                        <p className="text-mist/60 italic">"{s.facilitatorFeedback}"</p>
+                      </div>
+                    )}
 
                     {s.improvement && (
                       <div className="bg-navy/70 p-3 rounded-xl border border-mist/15 text-xs space-y-1.5">

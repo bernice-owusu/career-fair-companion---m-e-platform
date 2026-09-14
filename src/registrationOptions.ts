@@ -10,6 +10,9 @@ export const AREA_OF_PRACTICE_OPTIONS = [
   'Marketing',
   'Academia & Research',
   'Regulatory',
+  'Pharmacovigilance',
+  'Supply Chain',
+  'Health-Tech / Digital Health',
   'Other',
 ];
 
@@ -33,6 +36,34 @@ export const CAREER_PATH_OPTIONS = [
   'Academia',
   'Marketing',
   'Regulatory',
+  'Pharmacovigilance',
+  'Supply Chain',
+  'Health-Tech / Digital Health',
+  'Other',
+];
+
+export const CAREER_STAGE_OPTIONS = [
+  'Pharmacy graduate (Awaiting December Professional Exams)',
+  'House Officer / Intern Pharmacist',
+  'Early-Career Pharmacist (1–3 years post-licensure)',
+  'Mid-to-Senior Level Pharmacist',
+];
+
+export const CAREER_CHALLENGES_OPTIONS = [
+  'Limited awareness of diverse career options outside hospital/community practice',
+  'Lack of structured mentorship or professional networks',
+  'Gaps in practical employability skills (CV writing, LinkedIn branding, interviewing)',
+  'Geographic or institutional isolation (limited access to employers/fairs)',
+  'Scarcity of formal entry-level opportunities or public sector openings',
+  'Other',
+];
+
+export const ACTIONABLE_NEXT_STEPS_OPTIONS = [
+  'Updating my CV for industry roles',
+  'Reaching out to a mentor I met today',
+  'Applying for a pharmacovigilance internship',
+  'Exploring non-traditional career pathways online',
+  'Joining a professional network or association',
   'Other',
 ];
 
@@ -81,6 +112,22 @@ export const INTERVIEW_CONFIDENCE_LABELS: Record<number, string> = {
   3: 'Neutral',
   4: 'Confident',
   5: 'Very Confident',
+};
+
+export const CAREER_AWARENESS_LABELS: Record<number, string> = {
+  1: 'Very Low / Unaware',
+  2: 'Low',
+  3: 'Moderate',
+  4: 'High',
+  5: 'Very High / Well-Informed',
+};
+
+export const CAREER_TRANSITION_CONFIDENCE_LABELS: Record<number, string> = {
+  1: 'Not Confident at all',
+  2: 'Slightly Confident',
+  3: 'Moderately Confident',
+  4: 'Confident',
+  5: 'Extremely Confident',
 };
 
 // Characters used for registration codes. Ambiguous pairs (O/0, I/1, S/5) are excluded.
