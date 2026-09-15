@@ -10,9 +10,7 @@ export const AREA_OF_PRACTICE_OPTIONS = [
   'Marketing',
   'Academia & Research',
   'Regulatory',
-  'Pharmacovigilance',
-  'Supply Chain',
-  'Health-Tech / Digital Health',
+  'Non-Traditional (Pharmacovigilance, Supply Chain, Health-Tech, etc.)',
   'Other',
 ];
 
@@ -36,9 +34,7 @@ export const CAREER_PATH_OPTIONS = [
   'Academia',
   'Marketing',
   'Regulatory',
-  'Pharmacovigilance',
-  'Supply Chain',
-  'Health-Tech / Digital Health',
+  'Non-Traditional (Pharmacovigilance, Supply Chain, Health-Tech, etc.)',
   'Other',
 ];
 
